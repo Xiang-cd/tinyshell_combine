@@ -1,9 +1,10 @@
 #include "Terminal.h"
+#include <stack>
+#include <vector>
+
 Terminal gTerm;
 int Argc;
 char *Argv[MAXARG] = {};
-
-
 
 
 void doTee(int argc, char *argv[]) {
@@ -18,8 +19,66 @@ void doCp(int argc, char *argv[]) {
     TestArg(argc, argv);
 }
 
+vector<string> splitpath(string tmp) {
+    vector<string> ans;
+    regex parttern("/");
+    sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
+    decltype(pos) end;
+    for (; pos != end; ++pos) {
+        if (!regex_match(pos->str(), regex("\\s*")))ans.push_back(pos->str());
+    }
+    return ans;
+}
+
 void doCd(int argc, char *argv[]) {
-    TestArg(argc, argv);
+    if (argc >= 3) {
+        cerr << "invalid arguments!" << endl;
+        return;
+    } else if (argc < 2) {
+        cerr << "lack of arguments!" << endl;
+        return;
+    }
+    string P = argv[1];
+    stack<string> final_path;
+    if (regex_match(P, regex("--help"))) {
+
+    } else if (regex_match(P, regex("/((\\w|-|.)*/)*(\\w|-|.)*/?"))) {
+        vector<string> lst = splitpath(P);
+        for (int i = 0; i < lst.size(); ++i) {
+            cout << lst[i] << endl;
+        }
+        cout << "end lst" << endl;
+        for (int i = 0; i < lst.size(); ++i) {
+            cout << "prossc " << lst[i] << endl;
+            if (regex_match(lst[i], regex("."))) continue;
+            else if (regex_match(lst[i], regex(".."))) {
+                if (!final_path.empty())final_path.pop();
+                else {
+                    cerr << "invalid path!" << endl;
+                    return;
+                }
+            } else if (regex_match(lst[i], regex("..."))) {
+                for (int j = 0; j < 2; ++j) {
+                    if (!final_path.empty())final_path.pop();
+                    else {
+                        cerr << "invalid path!" << endl;
+                        return;
+                    }
+                }
+            } else final_path.push(lst[i]);
+        }
+        while (!final_path.empty()) {
+            cout << final_path.top() << endl;
+            final_path.pop();
+        }
+    } else if (regex_match(P, regex("((\\w|-|.)*/)*(\\w|-|.)*/?"))) {
+        vector<string> ans = splitpath(P);
+        for (int i = 0; i < ans.size(); ++i) {
+            cout << ans[i] << endl;
+        }
+    } else {
+        cerr << "invalid path!" << endl;
+    }
 }
 
 void doPwd(int argc, char *argv[]) {
@@ -59,10 +118,11 @@ inline void printColor(const string &s, int front, int color, bool light = false
     else printf("\033[1;%d%dm%s\033[0m", front, color, s.c_str());
 }
 
-inline void printTheme(const string &a, int front, int color, const string &b, int front2, int color2,bool light = true) {
-    printColor(a, front, color,light);
+inline void
+printTheme(const string &a, int front, int color, const string &b, int front2, int color2, bool light = true) {
+    printColor(a, front, color, light);
     cout << ":";
-    printColor(b, front2, color2,light);
+    printColor(b, front2, color2, light);
 }
 
 void printHeading(bool right) {
@@ -78,8 +138,8 @@ void printHeading(bool right) {
     } else {
         printTheme(a, 3, 2, b, 3, 4);
     }
-    if (right)cout<<"$";
-    else printColor("$",3,1);
+    if (right)cout << "$";
+    else printColor("$", 3, 1);
 }
 
 inline string BasicInit(const string &input, const regex &ex) {
@@ -90,15 +150,14 @@ inline string BasicInit(const string &input, const regex &ex) {
         getline(cin, temp);
         if (strlen(temp.c_str()) > MAXLINE) {
             cerr << "too long input name, please input again!\n";
-            cout<<input;
+            cout << input;
             continue;
         }
         flag = regex_match(temp, ex);
-        if (!flag){
+        if (!flag) {
             cerr << "invalid name, please input again!\n";
-            cout<<input;
-        }
-        else break;
+            cout << input;
+        } else break;
     }
     return temp;
 }
