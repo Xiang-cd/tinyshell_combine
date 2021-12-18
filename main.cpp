@@ -5,6 +5,7 @@
 #include <string>
 
 #define  MAXARG 20
+#define Develop true
 
 using namespace std;
 
@@ -12,9 +13,21 @@ extern Terminal gTerm;
 extern int Argc;
 extern char *Argv[MAXARG];
 
-int main() {
+int main(int argc, char *argv[]) {
     system("clear");
-    GetAccountInit();
+    if (Develop) {
+        string tmp = argv[0];
+        const regex parten("/((\\w|-|.|_)*/)*");
+        smatch path;
+        if (regex_search(tmp, path, parten)) {
+            memcpy(gTerm.root,path[0].str().c_str(),strlen(path[0].str().c_str()));
+            memcpy(gTerm.wdir,path[0].str().c_str(),strlen(path[0].str().c_str()));
+            gTerm.root[strlen(gTerm.root)-1] = '\0';
+            gTerm.wdir[strlen(gTerm.wdir)-1] = '\0';
+        }
+    } else {
+        GetAccountInit();
+    }
     string tmp;
     smatch args;
     for (int i = 0; i < MAXARG; ++i) {
