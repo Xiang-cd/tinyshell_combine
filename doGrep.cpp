@@ -130,8 +130,8 @@ int commandLineParse(int argc,char * argv[], vector<File>& file, string& p) //�
                 else if(argv[i][0] == '-'){} //表示从标准输入读取
                 else //表示从相对路径读取
                 {
-                    Dir = gTerm.wdir;
-                    Dir += '/';
+                    Dir = gTerm.root;
+                    Dir += gTerm.wdir;
                     Dir += argv[i];
                 }
                 File f(fName, Dir);
