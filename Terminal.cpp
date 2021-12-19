@@ -30,6 +30,36 @@ vector<string> splitpath(string tmp) {
     return ans;
 }
 
+bool processpath(vector<string> lst, stack<string> &final_path) {
+    for (int i = 0; i < lst.size(); ++i) {
+        if (regex_match(lst[i], regex("\\."))) continue;
+        else if (regex_match(lst[i], regex("\\.\\."))) {
+            if (!final_path.empty())final_path.pop();
+            else {
+                cerr << "invalid path!" << endl;
+                return false;
+            }
+        }else final_path.push(lst[i]);
+    }
+    return true;
+}
+
+void combinepath(stack<string> final) {
+    stack<string> tmp;
+    string ans = "/";
+    while (!final.empty()) {
+        tmp.push(final.top());
+        final.pop();
+    }
+    while (!tmp.empty()) {
+        ans += tmp.top();
+        ans += "/";
+        tmp.pop();
+    }
+    strcpy(gTerm.wdir, ans.c_str());
+    if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir)>1)gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
+}
+
 void doCd(int argc, char *argv[]) {
     if (argc >= 3) {
         cerr << "invalid arguments!" << endl;
@@ -42,40 +72,17 @@ void doCd(int argc, char *argv[]) {
     stack<string> final_path;
     if (regex_match(P, regex("--help"))) {
 
-    } else if (regex_match(P, regex("/((\\w|-|.)*/)*(\\w|-|.)*/?"))) {
+    } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
         vector<string> lst = splitpath(P);
-        for (int i = 0; i < lst.size(); ++i) {
-            cout << lst[i] << endl;
-        }
-        cout << "end lst" << endl;
-        for (int i = 0; i < lst.size(); ++i) {
-            cout << "prossc " << lst[i] << endl;
-            if (regex_match(lst[i], regex("."))) continue;
-            else if (regex_match(lst[i], regex(".."))) {
-                if (!final_path.empty())final_path.pop();
-                else {
-                    cerr << "invalid path!" << endl;
-                    return;
-                }
-            } else if (regex_match(lst[i], regex("..."))) {
-                for (int j = 0; j < 2; ++j) {
-                    if (!final_path.empty())final_path.pop();
-                    else {
-                        cerr << "invalid path!" << endl;
-                        return;
-                    }
-                }
-            } else final_path.push(lst[i]);
-        }
-        while (!final_path.empty()) {
-            cout << final_path.top() << endl;
-            final_path.pop();
-        }
-    } else if (regex_match(P, regex("((\\w|-|.)*/)*(\\w|-|.)*/?"))) {
-        vector<string> ans = splitpath(P);
-        for (int i = 0; i < ans.size(); ++i) {
-            cout << ans[i] << endl;
-        }
+        if (!processpath(lst, final_path)) return;
+        combinepath(final_path);
+    } else if (regex_match(P, regex("((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
+        string abs = gTerm.wdir;
+        abs += "/";
+        abs += P;
+        vector<string> lst = splitpath(abs);
+        if (!processpath(lst, final_path)) return;
+        combinepath(final_path);
     } else {
         cerr << "invalid path!" << endl;
     }
