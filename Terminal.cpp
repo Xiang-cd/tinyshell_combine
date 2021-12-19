@@ -1,6 +1,7 @@
 #include "Terminal.h"
 #include <stack>
 #include <vector>
+#include <unistd.h>
 
 Terminal gTerm;
 int Argc;
@@ -11,11 +12,45 @@ void doTee(int argc, char *argv[]) {
     TestArg(argc, argv);
 }
 
+
 void doCat(int argc, char *argv[]) {
-    TestArg(argc, argv);
+    int o;
+    bool opts[4] = {false};
+    if (argc < 2) {
+        cerr << "lack of arguments" << endl;
+        return;
+    }
+    vector<string> arguments;
+    for (int i = 1; i < argc; ++i) {
+        string tmp = argv[i];
+        arguments.push_back(tmp);
+    }
+    vector<string> filelist;
+    for (int i = 0; i < arguments.size(); ++i) {
+        if (regex_match(arguments[i], regex("-\\w+"))) {
+            if (regex_match(arguments[i], regex("-n"))) {
+                opts[0] = true;
+            } else if (regex_match(arguments[i], regex("-b"))) {
+                opts[1] = true;
+            } else if (regex_match(arguments[i], regex("-s"))) {
+                opts[2] = true;
+            } else if (regex_match(arguments[i], regex("-E"))) {
+                opts[3] = true;
+            } else{
+                cerr<<"invalid argument!"<<endl;
+                return;
+            }
+        } else {
+            filelist.push_back(arguments[i]);
+        }
+    }
+
+    printf("%d %d %d %d\n", opts[0], opts[1], opts[2], opts[3
+    ]);
 }
 
 void doCp(int argc, char *argv[]) {
+
     TestArg(argc, argv);
 }
 
@@ -39,7 +74,7 @@ bool processpath(vector<string> lst, stack<string> &final_path) {
                 cerr << "invalid path!" << endl;
                 return false;
             }
-        }else final_path.push(lst[i]);
+        } else final_path.push(lst[i]);
     }
     return true;
 }
@@ -57,7 +92,7 @@ void combinepath(stack<string> final) {
         tmp.pop();
     }
     strcpy(gTerm.wdir, ans.c_str());
-    if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir)>1)gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
+    if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir) > 1)gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
 }
 
 void doCd(int argc, char *argv[]) {
@@ -71,9 +106,9 @@ void doCd(int argc, char *argv[]) {
     string P = argv[1];
     stack<string> final_path;
     if (regex_match(P, regex("--help"))) {
-        cout<<"cd instruction is to change the working directory"<<endl;
-        cout<<"The cd utility shall change the working directory of the current shell execution environment"<<endl;
-        cout<<"use it like:\ncd /home/ect\n";
+        cout << "cd instruction is to change the working directory" << endl;
+        cout << "The cd utility shall change the working directory of the current shell execution environment" << endl;
+        cout << "use it like:\ncd /home/ect\n";
     } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
         vector<string> lst = splitpath(P);
         if (!processpath(lst, final_path)) return;
