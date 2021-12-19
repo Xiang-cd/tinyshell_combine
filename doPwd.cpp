@@ -2,7 +2,7 @@
 
 void doPwd(int argc, char * argv[])
 {
-    if(strcmp(argv[0], "--help") == 0)
+    if(strcmp(argv[1], "--help") == 0)
     {
         cerr << "pwd: Print the name of the current working dirctory." << endl;
         return ;
