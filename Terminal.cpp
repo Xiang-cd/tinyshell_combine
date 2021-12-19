@@ -49,11 +49,6 @@ void doCat(int argc, char *argv[]) {
     ]);
 }
 
-void doCp(int argc, char *argv[]) {
-
-    TestArg(argc, argv);
-}
-
 vector<string> splitpath(string tmp) {
     vector<string> ans;
     regex parttern("/");

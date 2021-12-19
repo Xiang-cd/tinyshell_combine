@@ -13,6 +13,7 @@ extern void doEcho(int argc, char *argv[]);
 extern void doGrep(int argc, char *argv[]);
 extern void doDiff(int argc,char* argv[]);
 extern void doPwd(int argc, char* argv[]);
+extern void doCp(int argc,char* argv[]);
 
 struct Terminal {
     char user[MAXLINE]; // 用户名
