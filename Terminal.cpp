@@ -81,12 +81,6 @@ void doCd(int argc, char *argv[]) {
     }
 }
 
-void doPwd(int argc, char *argv[]) {
-    TestArg(argc, argv);
-    string tmp = "pwd output";
-    memcpy(gTerm.strout, tmp.c_str(), strlen(tmp.c_str()));
-    cerr << "after pwd strout:" << gTerm.strout << endl;
-}
 
 void doLs(int argc, char *argv[]) {
     TestArg(argc, argv);
@@ -177,7 +171,8 @@ void GetAccountInit() {
     memcpy(gTerm.root, tmp.c_str(), strlen(tmp.c_str()));
     tmp = BasicInit("Login:", regex("(_|[a-z]|[A-Z])\\w*"));
     memcpy(gTerm.user, tmp.c_str(), strlen(tmp.c_str()));
-    memcpy(gTerm.wdir, gTerm.root, strlen(gTerm.root));
+    // memcpy(gTerm.wdir, gTerm.root, strlen(gTerm.root));
+    strcat(gTerm.wdir, "/"); //初识化的时候把根目录设置为/user/...，工作目录设置为/
     gTerm.theme = 0;
 }
 
