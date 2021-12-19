@@ -71,7 +71,9 @@ void doCd(int argc, char *argv[]) {
     string P = argv[1];
     stack<string> final_path;
     if (regex_match(P, regex("--help"))) {
-
+        cout<<"cd instruction is to change the working directory"<<endl;
+        cout<<"The cd utility shall change the working directory of the current shell execution environment"<<endl;
+        cout<<"use it like:\ncd /home/ect\n";
     } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
         vector<string> lst = splitpath(P);
         if (!processpath(lst, final_path)) return;
@@ -90,7 +92,10 @@ void doCd(int argc, char *argv[]) {
 
 
 void doLs(int argc, char *argv[]) {
-    TestArg(argc, argv);
+    string root = gTerm.root;
+    string work = gTerm.wdir;
+    string ans = "ls " + root + work;
+    system(ans.c_str());
 }
 
 void doCls(int argc, char *argv[]) {
@@ -106,6 +111,7 @@ void doChange(int argc, char *argv[]) {
         gTerm.theme = argv[1][0] - '0';
     }
 }
+
 //以上仅供调试,到合起来的时候得改
 
 
