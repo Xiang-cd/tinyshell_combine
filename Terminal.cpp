@@ -2,6 +2,7 @@
 #include <stack>
 #include <vector>
 #include <unistd.h>
+#include <fstream>
 
 Terminal gTerm;
 int Argc;
@@ -13,8 +14,58 @@ void doTee(int argc, char *argv[]) {
 }
 
 
+vector<string> splitpath(string tmp) {
+    vector<string> ans;
+    regex parttern("/");
+    sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
+    decltype(pos) end;
+    for (; pos != end; ++pos) {
+        if (!regex_match(pos->str(), regex("\\s*")))ans.push_back(pos->str());
+    }
+    return ans;
+}
+
+bool processpath(vector<string> lst, stack<string> &final_path) {
+    // 只进行.的过滤和..的合并, 其他不做处理
+    for (int i = 0; i < lst.size(); ++i) {
+        if (regex_match(lst[i], regex("\\."))) continue;
+        else if (regex_match(lst[i], regex("\\.\\."))) {
+            if (!final_path.empty())final_path.pop();
+            else {
+                cerr << "invalid path!" << endl;
+                return false;
+            }
+        } else final_path.push(lst[i]);
+    }
+    return true;
+}
+
+string combinepath(stack<string> final) {
+    stack<string> tmp;
+    string ans = "/";
+    while (!final.empty()) {
+        tmp.push(final.top());
+        final.pop();
+    }
+    while (!tmp.empty()) {
+        ans += tmp.top();
+        ans += "/";
+        tmp.pop();
+    }
+    return ans;
+}
+
+static inline void p(string &a, bool last, bool line, int &num) {
+    if (line) {
+        if (last)printf("%6d  %s$\n", num++, a.c_str());
+        else printf("%6d  %s\n", num++, a.c_str());
+    } else {
+        if (last)printf("        %s$\n", a.c_str());
+        else printf("        %s\n", a.c_str());
+    }
+}
+
 void doCat(int argc, char *argv[]) {
-    int o;
     bool opts[4] = {false};
     if (argc < 2) {
         cerr << "lack of arguments" << endl;
@@ -36,63 +87,85 @@ void doCat(int argc, char *argv[]) {
                 opts[2] = true;
             } else if (regex_match(arguments[i], regex("-E"))) {
                 opts[3] = true;
-            } else{
-                cerr<<"invalid argument!"<<endl;
+            } else {
+                cerr << "invalid argument!" << endl;
                 return;
             }
+        } else if (regex_match(arguments[i], regex("--help"))) {
+            cout << "cat - concatenate files and print on the standard output\n";
+            cout << "With no FILE, or when FILE is -, read standard input.\n";
+            cout << "-n with line number\n";
+            cout << "-b with line number, but no number for empty line\n";
+            cout << "-s only print one empty line if there are continues empty lines\n";
+            cout << "-E each line end with '$'\n";
+            return;
         } else {
             filelist.push_back(arguments[i]);
         }
     }
-
-    printf("%d %d %d %d\n", opts[0], opts[1], opts[2], opts[3
-    ]);
-}
-
-vector<string> splitpath(string tmp) {
-    vector<string> ans;
-    regex parttern("/");
-    sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
-    decltype(pos) end;
-    for (; pos != end; ++pos) {
-        if (!regex_match(pos->str(), regex("\\s*")))ans.push_back(pos->str());
-    }
-    return ans;
-}
-
-bool processpath(vector<string> lst, stack<string> &final_path) {
-    for (int i = 0; i < lst.size(); ++i) {
-        if (regex_match(lst[i], regex("\\."))) continue;
-        else if (regex_match(lst[i], regex("\\.\\."))) {
-            if (!final_path.empty())final_path.pop();
-            else {
-                cerr << "invalid path!" << endl;
-                return false;
+    int num = 1;
+    for (int i = 0; i < filelist.size(); ++i) {
+        string P = filelist[i];
+        stack<string> final_path;
+        string tmp;
+        if (regex_match(P, regex("-"))) {
+            cout << gTerm.strin << endl;
+            continue;
+        } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {
+            string abs = gTerm.root;
+            abs += P;
+            vector<string> lst = splitpath(abs);
+            if (!processpath(lst, final_path)) return;
+            tmp = combinepath(final_path);
+        } else if (regex_match(P, regex("((\\w|-|.)+/)*(\\w|-|.)+"))) {
+            string abs = gTerm.root;
+            abs += "/";
+            abs += gTerm.wdir;
+            abs += "/";
+            abs += P;
+            vector<string> lst = splitpath(abs);
+            if (!processpath(lst, final_path)) return;
+            tmp = combinepath(final_path);
+        } else {
+            cerr << "invalid path or file!" << endl;
+        }
+        tmp = tmp.substr(0, tmp.length() - 1);
+        ifstream fin(tmp);
+        if (!fin) {
+            cerr << tmp << ": No such file or directory\n";
+        } else {
+            string line;
+            bool last_empty = false;
+            while (!fin.eof()) {
+                getline(fin, line);
+                if ((opts[1] or opts[2]) and (regex_match(line, regex("\\s*")) or line.empty())) {
+                    if (opts[2]) {
+                        if (!last_empty) {
+                            last_empty = true;
+                            if (opts[1]) p(line, opts[3], false, num);
+                            else if (opts[0]) p(line, opts[3], true, num);
+                            else p(line, opts[3], false, num);
+                            continue;
+                        } else continue;
+                    } else {
+                        if (opts[1]) p(line, opts[3], false, num);
+                        else if (opts[0]) p(line, opts[3], true, num);
+                        else p(line, opts[3], false, num);
+                        continue;
+                    }
+                }
+                last_empty = false;
+                if (opts[1]) p(line, opts[3], true, num);
+                else if (opts[0]) p(line, opts[3], true, num);
+                else p(line, opts[3], false, num);
             }
-        } else final_path.push(lst[i]);
+        }
     }
-    return true;
-}
-
-void combinepath(stack<string> final) {
-    stack<string> tmp;
-    string ans = "/";
-    while (!final.empty()) {
-        tmp.push(final.top());
-        final.pop();
-    }
-    while (!tmp.empty()) {
-        ans += tmp.top();
-        ans += "/";
-        tmp.pop();
-    }
-    strcpy(gTerm.wdir, ans.c_str());
-    if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir) > 1)gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
 }
 
 void doCd(int argc, char *argv[]) {
     if (argc >= 3) {
-        cerr << "invalid arguments!" << endl;
+        cerr << "too many arguments!" << endl;
         return;
     } else if (argc < 2) {
         cerr << "lack of arguments!" << endl;
@@ -107,14 +180,20 @@ void doCd(int argc, char *argv[]) {
     } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
         vector<string> lst = splitpath(P);
         if (!processpath(lst, final_path)) return;
-        combinepath(final_path);
+        string tmp = combinepath(final_path);
+        strcpy(gTerm.wdir, tmp.c_str());
+        if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir) > 1)
+            gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
     } else if (regex_match(P, regex("((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
         string abs = gTerm.wdir;
         abs += "/";
         abs += P;
         vector<string> lst = splitpath(abs);
         if (!processpath(lst, final_path)) return;
-        combinepath(final_path);
+        string tmp = combinepath(final_path);
+        strcpy(gTerm.wdir, tmp.c_str());
+        if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir) > 1)
+            gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
     } else {
         cerr << "invalid path!" << endl;
     }
