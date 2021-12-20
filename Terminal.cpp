@@ -200,14 +200,14 @@ void doCd(int argc, char *argv[]) {
 }
 
 
-void doLs(int argc, char *argv[]) {
+void doLs() {
     string root = gTerm.root;
     string work = gTerm.wdir;
     string ans = "ls " + root + work;
     system(ans.c_str());
 }
 
-void doCls(int argc, char *argv[]) {
+void doCls() {
     system("clear");
 }
 
@@ -319,7 +319,7 @@ bool selectInstr() {
     } else if (regex_match(Argv[0], regex("pwd"))) {
         doPwd(Argc, Argv);
     } else if (regex_match(Argv[0], regex("ls"))) {
-        doLs(Argc, Argv);
+        doLs();
     } else if (regex_match(Argv[0], regex("cat"))) {
         doCat(Argc, Argv);
     } else if (regex_match(Argv[0], regex("tee"))) {
@@ -331,7 +331,7 @@ bool selectInstr() {
     } else if (regex_match(Argv[0], regex("grep"))) {
         doGrep(Argc, Argv);
     } else if (regex_match(Argv[0], regex("clear|cls"))) {
-        doCls(Argc, Argv);
+        doCls();
     } else if (regex_match(Argv[0], regex("vim"))) {
         doVim(Argc, Argv);
     } else if (regex_match(Argv[0], regex("change"))) {
