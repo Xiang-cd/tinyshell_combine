@@ -65,6 +65,29 @@ static inline void p(string &a, bool last, bool line, int &num) {
     }
 }
 
+static inline void select_print_mode(bool *opts, string line, bool &last_empty, int &num) {
+    if ((opts[1] or opts[2]) and (regex_match(line, regex("\\s*")) or line.empty())) {
+        if (opts[2]) {
+            if (!last_empty) {
+                last_empty = true;
+                if (opts[1]) p(line, opts[3], false, num);
+                else if (opts[0]) p(line, opts[3], true, num);
+                else p(line, opts[3], false, num);
+                return;
+            } else return;
+        } else {
+            if (opts[1]) p(line, opts[3], false, num);
+            else if (opts[0]) p(line, opts[3], true, num);
+            else p(line, opts[3], false, num);
+            return;
+        }
+    }
+    last_empty = false;
+    if (opts[1]) p(line, opts[3], true, num);
+    else if (opts[0]) p(line, opts[3], true, num);
+    else p(line, opts[3], false, num);
+}
+
 void doCat(int argc, char *argv[]) {
     bool opts[4] = {false};
     if (argc < 2) {
@@ -109,7 +132,18 @@ void doCat(int argc, char *argv[]) {
         stack<string> final_path;
         string tmp;
         if (regex_match(P, regex("-"))) {
-            cout << gTerm.strin << endl;
+            tmp = gTerm.strin;
+            regex parttern("\\n");
+            vector<string> lines;
+            sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
+            decltype(pos) end;
+            for (; pos != end; ++pos) {
+                lines.push_back(pos->str());
+            }
+            bool last_empty = false;
+            for (int j = 0; j < lines.size(); ++j) {
+                select_print_mode(opts, lines[i], last_empty, num);
+            }
             continue;
         } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {
             string abs = gTerm.root;
@@ -138,26 +172,7 @@ void doCat(int argc, char *argv[]) {
             bool last_empty = false;
             while (!fin.eof()) {
                 getline(fin, line);
-                if ((opts[1] or opts[2]) and (regex_match(line, regex("\\s*")) or line.empty())) {
-                    if (opts[2]) {
-                        if (!last_empty) {
-                            last_empty = true;
-                            if (opts[1]) p(line, opts[3], false, num);
-                            else if (opts[0]) p(line, opts[3], true, num);
-                            else p(line, opts[3], false, num);
-                            continue;
-                        } else continue;
-                    } else {
-                        if (opts[1]) p(line, opts[3], false, num);
-                        else if (opts[0]) p(line, opts[3], true, num);
-                        else p(line, opts[3], false, num);
-                        continue;
-                    }
-                }
-                last_empty = false;
-                if (opts[1]) p(line, opts[3], true, num);
-                else if (opts[0]) p(line, opts[3], true, num);
-                else p(line, opts[3], false, num);
+                select_print_mode(opts, line, last_empty, num);
             }
         }
     }
