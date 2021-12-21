@@ -1,7 +1,6 @@
 #include "Terminal.h"
 #include <stack>
 #include <vector>
-#include <unistd.h>
 #include <fstream>
 
 Terminal gTerm;
@@ -56,13 +55,16 @@ string combinepath(stack<string> final) {
 }
 
 static inline void p(string &a, bool last, bool line, int &num) {
+    char *tmp = new char[MAXLINE];
     if (line) {
-        if (last)printf("%6d  %s$\n", num++, a.c_str());
-        else printf("%6d  %s\n", num++, a.c_str());
+        if (last)sprintf(tmp, "%6d  %s$\n", num++, a.c_str());
+        else sprintf(tmp, "%6d  %s\n", num++, a.c_str());
     } else {
-        if (last)printf("        %s$\n", a.c_str());
-        else printf("        %s\n", a.c_str());
+        if (last)sprintf(tmp, "        %s$\n", a.c_str());
+        else sprintf(tmp, "        %s\n", a.c_str());
     }
+    strcat(gTerm.strout, tmp);
+    delete[]tmp;
 }
 
 static inline void select_print_mode(bool *opts, string line, bool &last_empty, int &num) {
@@ -71,24 +73,21 @@ static inline void select_print_mode(bool *opts, string line, bool &last_empty, 
             if (!last_empty) {
                 last_empty = true;
                 if (opts[1]) p(line, opts[3], false, num);
-                else if (opts[0]) p(line, opts[3], true, num);
-                else p(line, opts[3], false, num);
+                else p(line, opts[3], opts[0], num);
                 return;
             } else return;
         } else {
             if (opts[1]) p(line, opts[3], false, num);
-            else if (opts[0]) p(line, opts[3], true, num);
-            else p(line, opts[3], false, num);
+            else p(line, opts[3], opts[0], num);
             return;
         }
     }
     last_empty = false;
-    if (opts[1]) p(line, opts[3], true, num);
-    else if (opts[0]) p(line, opts[3], true, num);
-    else p(line, opts[3], false, num);
+    p(line, opts[3], opts[0] or opts[1], num);
 }
 
 void doCat(int argc, char *argv[]) {
+    memset(gTerm.strout, 0, MAXFILE);
     bool opts[4] = {false};
     if (argc < 2) {
         cerr << "lack of arguments" << endl;
@@ -126,6 +125,10 @@ void doCat(int argc, char *argv[]) {
             filelist.push_back(arguments[i]);
         }
     }
+    if (filelist.empty()) {
+        cerr << "lack of file!\n";
+        return;
+    }
     int num = 1;
     for (int i = 0; i < filelist.size(); ++i) {
         string P = filelist[i];
@@ -133,16 +136,20 @@ void doCat(int argc, char *argv[]) {
         string tmp;
         if (regex_match(P, regex("-"))) {
             tmp = gTerm.strin;
-            regex parttern("\\n");
             vector<string> lines;
-            sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
-            decltype(pos) end;
-            for (; pos != end; ++pos) {
-                lines.push_back(pos->str());
+            string buffer;
+            for (int j = 0; j < tmp.size(); ++j) {
+                if (tmp[j] == '\n') {
+                    lines.push_back(buffer);
+                    buffer.clear();
+                } else {
+                    buffer += tmp[j];
+                }
             }
+            if (!buffer.empty())lines.push_back(buffer);
             bool last_empty = false;
             for (int j = 0; j < lines.size(); ++j) {
-                select_print_mode(opts, lines[i], last_empty, num);
+                select_print_mode(opts, lines[j], last_empty, num);
             }
             continue;
         } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {
