@@ -1,5 +1,5 @@
-main:main.o Terminal.o doEcho.o fileProcess.o stringProcess.o doGrep.o doDiff.o doPwd.o doCp.o
-	g++ main.o Terminal.o doEcho.o fileProcess.o stringProcess.o doGrep.o doDiff.o doPwd.o doCp.o -o main
+main:main.o Terminal.o doEcho.o fileProcess.o stringProcess.o doGrep.o doDiff.o doPwd.o doCp.o doTee.o
+	g++ main.o Terminal.o doEcho.o fileProcess.o stringProcess.o doGrep.o doDiff.o doPwd.o doCp.o doTee.o -o main
 Terminal.o:Terminal.h Terminal.cpp doEcho.h doGrep.h doDiff.h doCp.h
 	g++ -c Terminal.cpp -o Terminal.o
 main.o:main.cpp Terminal.h
@@ -18,5 +18,7 @@ doPwd.o:doPwd.h doPwd.cpp Terminal.h
 	g++ -c doPwd.cpp -o doPwd.o
 doCp.o:doCp.h doCp.cpp Terminal.h
 	g++ -c doCp.cpp -o doCp.o
+doTee.o:doTee.h doTee.cpp Terminal.h
+	g++ -c doTee.cpp -o doTee.o
 clean:
 	rm *.o

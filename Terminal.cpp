@@ -7,12 +7,6 @@ Terminal gTerm;
 int Argc;
 char *Argv[MAXARG] = {};
 
-
-void doTee(int argc, char *argv[]) {
-    TestArg(argc, argv);
-}
-
-
 vector<string> splitpath(string tmp) {
     vector<string> ans;
     regex parttern("/");
