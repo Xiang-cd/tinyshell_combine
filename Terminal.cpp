@@ -60,15 +60,15 @@ static inline void p(string &a, bool last, bool line, int &num) {
         if (last)sprintf(tmp, "%6d  %s$\n", num++, a.c_str());
         else sprintf(tmp, "%6d  %s\n", num++, a.c_str());
     } else {
-        if (last)sprintf(tmp, "        %s$\n", a.c_str());
-        else sprintf(tmp, "        %s\n", a.c_str());
+        if (last)sprintf(tmp, "%s$\n", a.c_str());
+        else sprintf(tmp, "%s\n", a.c_str());
     }
     strcat(gTerm.strout, tmp);
     delete[]tmp;
 }
 
 static inline void select_print_mode(bool *opts, string line, bool &last_empty, int &num) {
-    if ((opts[1] or opts[2]) and (regex_match(line, regex("\\s*")) or line.empty())) {
+    if ((opts[1] or opts[2]) and ( line.empty())) {
         if (opts[2]) {
             if (!last_empty) {
                 last_empty = true;
@@ -313,6 +313,7 @@ void GetAccountInit() {
     memcpy(gTerm.mach, tmp.c_str(), strlen(tmp.c_str()));
     tmp = BasicInit("Root Dir:", regex("/((\\w|-|.)*/)*(\\w|-|.)*/?"));
     memcpy(gTerm.root, tmp.c_str(), strlen(tmp.c_str()));
+    if (strlen(gTerm.root)>1 and gTerm.root[strlen(gTerm.root)-1] == '/')gTerm.root[strlen(gTerm.root)-1] = '\0';
     tmp = BasicInit("Login:", regex("(_|[a-z]|[A-Z])\\w*"));
     memcpy(gTerm.user, tmp.c_str(), strlen(tmp.c_str()));
     // memcpy(gTerm.wdir, gTerm.root, strlen(gTerm.root));
