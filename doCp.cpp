@@ -51,6 +51,7 @@ void doCp(int argc, char * argv[])
         {
             file[i] = gTerm.root;
             file[i] += gTerm.wdir;
+            file[i] += "/";
             file[i] += argv[i + n_flag + 1];
         }
     }
@@ -73,5 +74,4 @@ void doCp(int argc, char * argv[])
     else fout.open(file[1],ios::app);
     fout << source;
     fout.close();
-    
 }

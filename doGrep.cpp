@@ -132,6 +132,7 @@ int commandLineParse(int argc,char * argv[], vector<File>& file, string& p) //å¯
                 {
                     Dir = gTerm.root;
                     Dir += gTerm.wdir;
+                    Dir += "/";
                     Dir += argv[i];
                 }
                 File f(fName, Dir);
