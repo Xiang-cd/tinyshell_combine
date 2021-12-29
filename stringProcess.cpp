@@ -2,23 +2,18 @@
 
 void splitByStar(string s,vector<string>& v)//将s通过*号分开，j指向待分割子串的首端，i指向待分割子串的末端
 {
-    int i = 0, j = 0; 
-    while(i < s.size()) //逐一去扫描字符串中的每一个字符
+    string tmp;
+    for(int i = 0; i < s.size(); ++i)
     {
-        if(s[i] != '*') //如果遇到的不是*号，就扩大待分割子串的规模
+        if(s[i] == '*')
         {
-            i++;
+            v.push_back(tmp);
+            tmp = "";
+            continue;
         }
-        else //如果遇到的是*号
-        {
-            v.push_back(s.substr(j, i - j)); //先将该*号和上一个*号中间的子串分割出来
-            while(i<s.size() && s[i] == '*') //如果遇到多个*号，则只需要取第一个即可，后续的*号全部跳过
-            {
-                j = ++i;
-            }
-        }
+        tmp.push_back(s[i]);
     }
-    v.push_back(s.substr(j, i - j)); //将最后一个分割串的信息存储
+    v.push_back(tmp);
 }
 
 int findFirstOf(string P,string T, int idx) //在文本串T中找到模式串P第一次出现的位置，(.可以匹配任意字符)
