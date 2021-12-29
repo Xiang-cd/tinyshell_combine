@@ -16,17 +16,20 @@ bool File::getContents() //获取当前文件的内容
     if(fileName == "(standard input)")
     {
         string str = gTerm.strin;
-        str.push_back('\n');
-        int last = 0;
-        int idx = str.find("\n",0);
-        while(idx != -1)
+        string tmp;
+        for(int i = 0; i < str.size(); i++)
         {
-            contents.push_back(str.substr(last, idx - last));
-            matchPositions.push_back(make_pair(-1,-1));
-            output.push_back(0);
-            last = idx + 1;
-            idx = str.find("\n", last);
+            if(str[i] == '\n')
+            {
+                contents.push_back(tmp);
+                matchPositions.push_back(make_pair(-1,-1));
+                output.push_back(0);
+                tmp = "";
+                continue;
+            }
+            tmp.push_back(str[i]);
         }
+        if(tmp.size()) contents.push_back(tmp);
         return true;
     }
     else
