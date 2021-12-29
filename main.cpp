@@ -5,7 +5,7 @@
 #include <string>
 
 #define  MAXARG 20
-#define Develop false
+#define Develop true
 
 using namespace std;
 

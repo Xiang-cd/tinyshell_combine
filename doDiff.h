@@ -5,7 +5,7 @@
 #include <cstring>
 #include <fstream>
 #include "Terminal.h"
-#define  Debug false
+#define  Debug true
 
 extern Terminal gTerm;
 

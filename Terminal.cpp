@@ -62,7 +62,7 @@ static inline void p(string &a, bool last, bool line, int &num) {
 }
 
 static inline void select_print_mode(bool *opts, string line, bool &last_empty, int &num) {
-    if ((opts[1] or opts[2]) and ( line.empty())) {
+    if ((opts[1] or opts[2]) and (line.empty())) {
         if (opts[2]) {
             if (!last_empty) {
                 last_empty = true;
@@ -83,7 +83,7 @@ static inline void select_print_mode(bool *opts, string line, bool &last_empty, 
 void doCat(int argc, char *argv[]) {
     memset(gTerm.strout, 0, MAXFILE);
     bool opts[4] = {false};
-    if (argc < 2) {
+    if (argc < 2) {   //这里是参数数量判断
         cerr << "lack of arguments" << endl;
         return;
     }
@@ -93,8 +93,9 @@ void doCat(int argc, char *argv[]) {
         arguments.push_back(tmp);
     }
     vector<string> filelist;
+    bool file_start = false;
     for (int i = 0; i < arguments.size(); ++i) {
-        if (regex_match(arguments[i], regex("-\\w+"))) {
+        if (regex_match(arguments[i], regex("-\\w+")) and !file_start) {
             if (regex_match(arguments[i], regex("-n"))) {
                 opts[0] = true;
             } else if (regex_match(arguments[i], regex("-b"))) {
@@ -117,6 +118,7 @@ void doCat(int argc, char *argv[]) {
             return;
         } else {
             filelist.push_back(arguments[i]);
+            file_start = true;
         }
     }
     if (filelist.empty()) {
@@ -307,12 +309,35 @@ void GetAccountInit() {
     memcpy(gTerm.mach, tmp.c_str(), strlen(tmp.c_str()));
     tmp = BasicInit("Root Dir:", regex("/((\\w|-|.)*/)*(\\w|-|.)*/?"));
     memcpy(gTerm.root, tmp.c_str(), strlen(tmp.c_str()));
-    if (strlen(gTerm.root)>1 and gTerm.root[strlen(gTerm.root)-1] == '/')gTerm.root[strlen(gTerm.root)-1] = '\0';
+    if (strlen(gTerm.root) > 1 and gTerm.root[strlen(gTerm.root) - 1] == '/')gTerm.root[strlen(gTerm.root) - 1] = '\0';
     tmp = BasicInit("Login:", regex("(_|[a-z]|[A-Z])\\w*"));
     memcpy(gTerm.user, tmp.c_str(), strlen(tmp.c_str()));
     // memcpy(gTerm.wdir, gTerm.root, strlen(gTerm.root));
     strcat(gTerm.wdir, "/"); //初识化的时候把根目录设置为/user/...，工作目录设置为/
     gTerm.theme = 0;
+    string welcome = "    ███████    █████                                                                    \n"
+                     "  ███░░░░░███ ░░███                                                                     \n"
+                     " ███     ░░███ ░███████      █████████████   █████ ████                                 \n"
+                     "░███      ░███ ░███░░███    ░░███░░███░░███ ░░███ ░███                                  \n"
+                     "░███      ░███ ░███ ░███     ░███ ░███ ░███  ░███ ░███                                  \n"
+                     "░░███     ███  ░███ ░███     ░███ ░███ ░███  ░███ ░███                                  \n"
+                     " ░░░███████░   ████ █████    █████░███ █████ ░░███████                                  \n"
+                     "   ░░░░░░░    ░░░░ ░░░░░    ░░░░░ ░░░ ░░░░░   ░░░░░███                                  \n"
+                     "                                              ███ ░███                                  \n"
+                     "                                             ░░██████                                   \n"
+                     "                                              ░░░░░░                                    \n"
+                     "  █████     ███                                   █████               ████  ████     ███\n"
+                     " ░░███     ░░░                                   ░░███               ░░███ ░░███    ░███\n"
+                     " ███████   ████  ████████   █████ ████     █████  ░███████    ██████  ░███  ░███    ░███\n"
+                     "░░░███░   ░░███ ░░███░░███ ░░███ ░███     ███░░   ░███░░███  ███░░███ ░███  ░███    ░███\n"
+                     "  ░███     ░███  ░███ ░███  ░███ ░███    ░░█████  ░███ ░███ ░███████  ░███  ░███    ░███\n"
+                     "  ░███ ███ ░███  ░███ ░███  ░███ ░███     ░░░░███ ░███ ░███ ░███░░░   ░███  ░███    ░░░ \n"
+                     "  ░░█████  █████ ████ █████ ░░███████     ██████  ████ █████░░██████  █████ █████    ███\n"
+                     "   ░░░░░  ░░░░░ ░░░░ ░░░░░   ░░░░░███    ░░░░░░  ░░░░ ░░░░░  ░░░░░░  ░░░░░ ░░░░░    ░░░ \n"
+                     "                             ███ ░███                                                   \n"
+                     "                            ░░██████                                                    \n"
+                     "                             ░░░░░░                                                     \n";
+    printColor(welcome, 3, 5);
 }
 
 void doVim(int argc, char *argv[]) {

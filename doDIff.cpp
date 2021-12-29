@@ -1,41 +1,40 @@
 #include "doDiff.h"
 
-void doDiff(int argc,char* argv[])
-{
-    if(argc<3&&strcmp(argv[1],"--help")!=0){
-        cerr<<"diff: 不符合要求的参数"<<endl;
+void doDiff(int argc, char *argv[]) {
+    if (argc < 3 && strcmp(argv[1], "--help") != 0) {
+        cerr << "diff: 不符合要求的参数" << endl;
         return;
     }
     //准备工作：
-    bool command[5] = { 0,0,0,0,0 };        //创建布尔数组储存用户是否有-b,-B等特殊要求
+    bool command[5] = {false};        //创建布尔数组储存用户是否有-b,-B等特殊要求
     struct zifu {                           //储存用户是否有-I的要求
         bool I;                             //是否有-I
         char zifu[20];                      //-I是什么
     };
     zifu command_I;
-    command_I.I = 0;                             //初始化-I
+    command_I.I = false;                             //初始化-I
 
     if (argc == 2 && strcmp(argv[1], "--help") == 0)         //用户执行了“帮助”指令，输出帮助直接返回。
-        {
-        strcpy(gTerm.strout, "帮助：\n本指令可逐行比较两个文件，特殊的比较规则为：\n-b：不检查空格字符的不同。\n-B：不检查空白行。\n- i：不检查大小写的不同。\n- q：仅显示有无差异，不显示详细的信息。无差异时不显示，有差异时显示“File[文件 1] and [文件 2] differ”。\n- w：忽略全部的空格字符。\n- I[字符串]：若两个文件在某几行有所不同，但这几行同时都包含了选项中指定字符串，则不显示这两个文件的差异。\n");
+    {
+        strcpy(gTerm.strout,
+               "帮助：\n本指令可逐行比较两个文件，特殊的比较规则为：\n-b：不检查空格字符的不同。\n-B：不检查空白行。\n- i：不检查大小写的不同。\n- q：仅显示有无差异，不显示详细的信息。无差异时不显示，有差异时显示“File[文件 1] and [文件 2] differ”。\n- w：忽略全部的空格字符。\n- I[字符串]：若两个文件在某几行有所不同，但这几行同时都包含了选项中指定字符串，则不显示这两个文件的差异。\n");
         return;
-        }
+    }
     for (int i = 1; i < argc - 2; i++)           //在布尔数组里储存特殊要求
-        {
-        if (strcmp(argv[i], "-b") == 0)  command[0] = 1;         //[0]储存-b
-        else if (strcmp(argv[i], "-B") == 0)  command[1] = 1;         //[1]储存-B
-        else if (strcmp(argv[i], "-i") == 0)  command[2] = 1;         //[2]储存-i
-        else if (strcmp(argv[i], "-q") == 0)  command[3] = 1;         //[3]储存-q
-        else if (strcmp(argv[i], "-w") == 0)  command[4] = 1;         //[4]储存-w
+    {
+        if (strcmp(argv[i], "-b") == 0) command[0] = true;         //[0]储存-b
+        else if (strcmp(argv[i], "-B") == 0) command[1] = true;         //[1]储存-B
+        else if (strcmp(argv[i], "-i") == 0) command[2] = true;         //[2]储存-i
+        else if (strcmp(argv[i], "-q") == 0) command[3] = true;         //[3]储存-q
+        else if (strcmp(argv[i], "-w") == 0) command[4] = true;         //[4]储存-w
         else if (argv[i][0] == '-' && argv[i][1] == 'I') {
-            command_I.I = 1;
+            command_I.I = true;
             strcpy(command_I.zifu, argv[i] + 2);
-        }
-        else {
+        } else {
             cerr << "diff: " << argv[i] << ": No such command" << endl;
             return;
         }
-        }
+    }
     if (test) {
         //输出记录结果测试：
         for (int i = 0; i <= 4; i++) {
@@ -51,23 +50,22 @@ void doDiff(int argc,char* argv[])
     int maxlinea = 0;    //统计test1的行数
     int maxlineb = 0;    //统计test2的行数
     //char patha[200], pathb[200];
-    char r[100]={0}, w[100]={0};
+    char r[100] = {0}, w[100] = {0};
     //strcpy(r, gTerm.root);
     strcpy(w, gTerm.wdir);
     if (argv[argc - 2][0] == '/') {//根目录
         strcpy(r, gTerm.root);
         strcat(r, argv[argc - 2]);
         strcat(r, "txt");
-    }
-    else {//相对路径
+    } else {//相对路径
         //strcat(r, "/");
         strcat(r, w);
         strcat(r, "/");
         strcat(r, argv[argc - 2]);
         //jdstrcat(r, ".txt");
     }
-    if(Debug)cout<<r<<endl;
-    if (argv[argc - 2] != "-") {
+    if (Debug)cout << r << endl;
+    if (strcmp(argv[argc - 2],"-") !=0) {
         ifstream test1(r);
         if (!test1) {
             cerr << "diff: " << argv[argc - 2] << ": No such file or directoty" << endl;
@@ -78,8 +76,7 @@ void doDiff(int argc,char* argv[])
             hang++;
         }
         maxlinea = hang - 1;
-    }
-    else {
+    } else {
         int hang = 1;
         int y = 0;
         while (true) {
@@ -97,23 +94,22 @@ void doDiff(int argc,char* argv[])
         }
         maxlinea = hang - 1;
     }
-    char r1[100]={0}, w1[100]={0};
+    char r1[100] = {0}, w1[100] = {0};
     //memcpy(r1, gTerm.root,strlen(gTerm.root));
-   // strcpy(r1, gTerm.root);
+    // strcpy(r1, gTerm.root);
     strcpy(w1, gTerm.wdir);
     if (argv[argc - 1][0] == '/') {//根目录
         strcpy(r1, gTerm.root);
         strcat(r1, argv[argc - 1]);
         strcat(r1, "txt");
-    }
-    else {//相对路径
+    } else {//相对路径
         //strcat(r1, "/");
         strcat(r1, w1);
         strcat(r1, "/");
         strcat(r1, argv[argc - 1]);
         //strcat(r1, ".txt");
     }
-    if(Debug)cout<<r1<<endl;
+    if (Debug)cout << r1 << endl;
     if (argv[argc - 1] != "-") {
         ifstream test2(r1);
         if (!test2) {
@@ -125,8 +121,7 @@ void doDiff(int argc,char* argv[])
             hang++;
         }
         maxlineb = hang - 1;
-    }
-    else if(argv[argc - 2] != "-"){//文件二需要从标准输入读取
+    } else if (argv[argc - 2] != "-") {//文件二需要从标准输入读取
         int hang = 1;
         int y = 0;
         while (true) {
@@ -143,8 +138,7 @@ void doDiff(int argc,char* argv[])
             }
         }
         maxlineb = hang - 1;
-    }
-    else {//两个文件均需要从标准输入读取
+    } else {//两个文件均需要从标准输入读取
         int hang = 1;
         int y = 0;
         while (gTerm.strin[y] != '\0') {
@@ -226,7 +220,7 @@ void doDiff(int argc,char* argv[])
                     }
                     file1_c[i][k] = 0;
                 }
-                if (file1_c[i][j] != ' '&& file1_c[i][j] != '\n')j++;
+                if (file1_c[i][j] != ' ' && file1_c[i][j] != '\n')j++;
             }
         }
         for (int i = 1; i <= maxlineb; i++) {//操作文件二，与一同理
@@ -270,7 +264,7 @@ void doDiff(int argc,char* argv[])
                             file1_c[i][k] = file1_c[i][k + 1];
                             k++;
                         }
-                        file1_c[i][k]= 0;
+                        file1_c[i][k] = 0;
                     }
                 }
                 j++;
@@ -346,12 +340,11 @@ void doDiff(int argc,char* argv[])
         for (int i = 0; i <= 20; i++) {//先测出指定字符串的长度。
             if (command_I.zifu[i] != '\0') {
                 length++;
-            }
-            else break;
+            } else break;
         }
-        for (int i = 1; i <=maxlinea; i++) {
+        for (int i = 1; i <= maxlinea; i++) {
             int j = 0;
-            while (file1_c[i][j]!='\n') {   //可能引发越界，但不影响结果，因为目标字符串不会含有\n
+            while (file1_c[i][j] != '\n') {   //可能引发越界，但不影响结果，因为目标字符串不会含有\n
                 int tong = true;
                 for (int k = 0; k < length; k++) {
                     if (file1_c[i][j + k] != command_I.zifu[k]) {
@@ -402,7 +395,7 @@ void doDiff(int argc,char* argv[])
 
 
     int konga = 0, kongb = 0;
-    int a[21],b[21];
+    int a[21], b[21];
     for (int i = 1; i <= 20; i++) {
         a[i] = i;
         b[i] = i;
@@ -411,12 +404,11 @@ void doDiff(int argc,char* argv[])
         char tempfile1[hangshu][lieshu] = {};
         char tempfile2[hangshu][lieshu] = {};
         for (int i = 1; i <= maxlinea; i++) {
-            if (strcmp(file1_c[i] , "\n")!=0) {//不是空白行，放到tempfile里
+            if (strcmp(file1_c[i], "\n") != 0) {//不是空白行，放到tempfile里
                 strcpy(tempfile1[i - konga], file1_c[i]);
-            }
-            else {//是空白行，不要它，但是a[j]需要发生对应的变化以保证tempfile第i行对应原文件的第a[i]行
-                for (int j = i-konga++; j <= maxlinea; j++) {
-                    a[j] =j+konga;
+            } else {//是空白行，不要它，但是a[j]需要发生对应的变化以保证tempfile第i行对应原文件的第a[i]行
+                for (int j = i - konga++; j <= maxlinea; j++) {
+                    a[j] = j + konga;
                 }
             }
         }
@@ -426,11 +418,10 @@ void doDiff(int argc,char* argv[])
         for (int i = 1; i <= maxlineb; i++) {//操作文件二，同理
             if ((strcmp(file2_c[i], "\n") != 0)) {
                 strcpy(tempfile2[i - kongb], file2_c[i]);
-            }
-            else {
+            } else {
 
-                for (int j = i-kongb++; j <= maxlineb; j++) {
-                    b[j]=j+kongb;
+                for (int j = i - kongb++; j <= maxlineb; j++) {
+                    b[j] = j + kongb;
                 }
             }
         }
@@ -467,10 +458,10 @@ void doDiff(int argc,char* argv[])
     }
 
     if (command[3] == 1) {
-        for (int i = 1; i <= maxlinea-konga; i++) {
+        for (int i = 1; i <= maxlinea - konga; i++) {
             int spot = 0;   //记录同一行中正在比较的位置
             bool same = true;
-            if (maxlinea-konga != maxlineb-kongb)same = false;
+            if (maxlinea - konga != maxlineb - kongb)same = false;
             while (file1_c[i][spot] == file2_c[i][spot]) {
                 if (file1_c[i][spot] == '\0') {
                     break;
@@ -497,8 +488,8 @@ void doDiff(int argc,char* argv[])
             sameline[i][j] = 0;
         }
     }
-    for (int i = 1; i <= maxlinea-konga; i++) {
-        for (int j = 1; j <= maxlineb-kongb; j++) {//测试文件一的第i行与文件二的第j行是否相同（手动实现strcmp)
+    for (int i = 1; i <= maxlinea - konga; i++) {
+        for (int j = 1; j <= maxlineb - kongb; j++) {//测试文件一的第i行与文件二的第j行是否相同（手动实现strcmp)
             bool same = true;
             int spot = 0;
             while (file1_c[i][spot] == file2_c[j][spot]) {
@@ -525,14 +516,11 @@ void doDiff(int argc,char* argv[])
 
     //开始递归找最大值
     bool aim[20][20];
-    for (int i = 0; i < 20; i++) {
-        for (int j = 0; j < 20; j++) {
-            aim[i][j] = 0;
-        }
-    }
+    memset(aim,0,20*20);
+
     int a1 = 0, b1 = 0;
-    int choose(int a, int b,int maxlinea,int maxlineb,bool sameline[20][20],bool aim[20][20]);
-    choose(1, 1, maxlinea-konga, maxlineb-kongb, sameline, aim);
+    int choose(int a, int b, int maxlinea, int maxlineb, bool sameline[20][20], bool aim[20][20]);
+    choose(1, 1, maxlinea - konga, maxlineb - kongb, sameline, aim);
 
     if (test) {
         //测试目标结果
@@ -564,16 +552,16 @@ void doDiff(int argc,char* argv[])
 
         if (!same) {//没有相同行，把它删了
             char out[8];
-            char out0[5] = { 'd','\0' };
+            char out0[5] = {'d', '\0'};
             char out1[8];
             sprintf(out, "%d", a[i]);
-            sprintf(out1, "%d",b[lineofb]);
+            sprintf(out1, "%d", b[lineofb]);
             strcat(out1, "\n");
             strcat(gTerm.strout, out);
             strcat(gTerm.strout, out0);
             strcat(gTerm.strout, out1);
-            char out2[2] = { '<','\0' };
-            char out3[2] = { '\n','\0' };
+            char out2[2] = {'<', '\0'};
+            char out3[2] = {'\n', '\0'};
             strcat(gTerm.strout, out2);
             strcat(gTerm.strout, file1[a[i]]);
             //strcat(gTerm.strout, out3);
@@ -589,20 +577,17 @@ void doDiff(int argc,char* argv[])
                     strcat(gTerm.strout, out2);
                     strcat(gTerm.strout, file1[a[i]]);
                     //strcat(gTerm.strout, out3);
-                }
-                else {
+                } else {
                     i--;
                     break;
                 }
                 if (i == maxlinea)break;
             }
-        }
-        else if (lineofb == sameofb) {//恰好相同，不输出
+        } else if (lineofb == sameofb) {//恰好相同，不输出
             lineofb++;
-        }
-        else if (lineofb < sameofb) {//b中多了好几行，全加进来
+        } else if (lineofb < sameofb) {//b中多了好几行，全加进来
             char out[8];
-            char out0[5] = { 'a','\0' };
+            char out0[5] = {'a', '\0'};
             char out1[8];
             sprintf(out, "%d", a[i]);
             sprintf(out1, "%d", b[lineofb]);
@@ -610,8 +595,8 @@ void doDiff(int argc,char* argv[])
             strcat(gTerm.strout, out);
             strcat(gTerm.strout, out0);
             strcat(gTerm.strout, out1);
-            char out2[2] = { '\n','\0' };
-            char out3[2] = { '>','\0' };
+            char out2[2] = {'\n', '\0'};
+            char out3[2] = {'>', '\0'};
             //strcat(gTerm.strout, out);
             for (; lineofb < sameofb; lineofb++) {//全部加入
                 strcat(gTerm.strout, out3);
@@ -622,13 +607,13 @@ void doDiff(int argc,char* argv[])
         }
         if (i == maxlinea && lineofb != maxlineb + 1) {//文件一已经结束，但文件二还有空余行，加进来
             char out[8];
-            char out0[5] = { 'a','\0' };
+            char out0[5] = {'a', '\0'};
             char out1[8];
             sprintf(out, "%d", a[i]);
             sprintf(out1, "%d", b[lineofb]);
             strcat(out1, "\n");
-            char out2[2] = { '\n','\0' };
-            char out3[2] = { '>','\0' };
+            char out2[2] = {'\n', '\0'};
+            char out3[2] = {'>', '\0'};
             strcat(gTerm.strout, out);
             strcat(gTerm.strout, out0);
             strcat(gTerm.strout, out1);
@@ -640,10 +625,10 @@ void doDiff(int argc,char* argv[])
     }
 }
 
-int choose(int a, int b,int maxlinea,int maxlineb,bool sameline[20][20],bool aim[20][20]) {//递归思路见说明文档
+int choose(int a, int b, int maxlinea, int maxlineb, bool sameline[20][20], bool aim[20][20]) {//递归思路见说明文档
     bool tong = false;
     int b2 = 0;
-    for (int i = b; i <=maxlineb; i++) {
+    for (int i = b; i <= maxlineb; i++) {
         if (sameline[a][i] == 1) {
             tong = true;
             b2 = i;
@@ -654,26 +639,24 @@ int choose(int a, int b,int maxlinea,int maxlineb,bool sameline[20][20],bool aim
         if (tong) {
             aim[a][b2] = 1;
             return 1;
-        }
-        else return 0;
+        } else return 0;
     }
     if (!tong) {
-        return choose(a + 1, b, maxlinea, maxlineb, sameline,aim);
-    }
-    else {
-        if (choose(a + 1, b, maxlinea, maxlineb, sameline,aim) <= choose(a + 1, b2+1, maxlinea, maxlineb, sameline,aim) + 1) {
+        return choose(a + 1, b, maxlinea, maxlineb, sameline, aim);
+    } else {
+        if (choose(a + 1, b, maxlinea, maxlineb, sameline, aim) <=
+            choose(a + 1, b2 + 1, maxlinea, maxlineb, sameline, aim) + 1) {
             for (int j = a; j <= maxlinea; j++) {//如果上一行中后者比较大，我实际上不应该执行前者，于是我重新赋0以抵消执行它的影响。
                 for (int i = 1; i <= maxlineb; i++) {
-                    aim[j][i] = 0;
+                    aim[j][i] = false;
                 }
             }
-            aim[a][b2] = 1;
-            return choose(a + 1, b2+1, maxlinea, maxlineb, sameline,aim) + 1;
-        }
-        else {//同理，我不应当执行后者，赋0来抵消
+            aim[a][b2] = true;
+            return choose(a + 1, b2 + 1, maxlinea, maxlineb, sameline, aim) + 1;
+        } else {//同理，我不应当执行后者，赋0来抵消
             for (int j = a; j <= maxlinea; j++) {
                 for (int i = 1; i <= maxlineb; i++) {
-                    aim[j][i] = 0;
+                    aim[j][i] = false;
                 }
             }
             return choose(a + 1, b, maxlinea, maxlineb, sameline, aim);
