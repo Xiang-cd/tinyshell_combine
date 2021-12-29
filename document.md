@@ -81,7 +81,7 @@
 
 本次大作业TinyShell的Grep指令实现，输出样式、报错样式、匹配模式等均按照标准的Linux样式。对于文件的处理，采用“面向对象程序设计”的思想，构建了File类。每个File对象负责对一个文件（包括从strin读入）进行处理，并记录每个文件的具体内容、其匹配的行数、匹配的区段等信息。最终执行指令的时候，由doGrep函数统一调用File类中存储的已经处理好的信息进行输出。
 
-![image-20211229234550587](/Users/lichenyu/Library/Application Support/typora-user-images/image-20211229234550587.png)
+![image-20211229234550587](https://tva1.sinaimg.cn/large/008i3skNly1gxv7lsaeygj31me0i4mz8.jpg)
 
 
 
@@ -155,17 +155,17 @@
 
     例如。例如，输入grep -c -A3 a a.txt会输出以下结果：
 
-    ![image-20211204192131050](/Users/lichenyu/Library/Application Support/typora-user-images/image-20211204192131050.png)
+    ![image-20211204192131050](https://tva1.sinaimg.cn/large/008i3skNly1gxv7lyuamuj318i0g4jsb.jpg)
 
   * 对于互相“排斥”的指令，以最后出现的为准
 
     例如,grep -A3 -A2 a a.txt则会以后出现的-A2为准:
 
-    ![image-20211204194153347](/Users/lichenyu/Library/Application Support/typora-user-images/image-20211204194153347.png)
+    ![image-20211204194153347](https://tva1.sinaimg.cn/large/008i3skNly1gxv7m1nb43j318g0im0tr.jpg)
 
     又如，grep -H -h a a.txt会以后出现的-h为准：
 
-    ![image-20211204195315723](/Users/lichenyu/Library/Application Support/typora-user-images/image-20211204195315723.png)
+    ![image-20211204195315723](https://tva1.sinaimg.cn/large/008i3skNly1gxv7m5ed5ej311m0isq40.jpg)
 
   基于以上思路，为了控制各个各个指令的开启关闭等状态，本次实现大作业时，在doGrep.h文件中定义了几个变量。
 
@@ -194,7 +194,7 @@
 
     例如，输入grep -g A a.txt：
 
-    ![image-20211204201634045](/Users/lichenyu/Library/Application Support/typora-user-images/image-20211204201634045.png)
+    ![image-20211204201634045](https://tva1.sinaimg.cn/large/008i3skNly1gxv7m8nc3kj30gk0403yt.jpg)
 
   * 参数输入错误
 
@@ -202,7 +202,7 @@
 
     例如：
 
-    ![image-20211204201942982](/Users/lichenyu/Library/Application Support/typora-user-images/image-20211204201942982.png)
+    ![image-20211204201942982](https://tva1.sinaimg.cn/large/008i3skNly1gxv7mbi0nbj30h80380t2.jpg)
 
 ### part3
 
