@@ -1,16 +1,16 @@
 #include "doTee.h"
 
-bool debug = 1;
+bool debug = true;
 void doTee(int argc, char* argv[]) {
 	strcpy(gTerm.strout, gTerm.strin);
 	if (debug) {
 		cout << gTerm.strout;
 	}
 	if (argc == 1) return;
-	bool command = 0;
+	bool command = false;
 	int i = 1;//循环变量
 	if (strcmp(argv[1], "-a") == 0) {
-		command = 1;
+		command = true;
 		i++;//第二个输入是指令，从下一个开始循环
 	}
 	//开始读取信息到file1里
