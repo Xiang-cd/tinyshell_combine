@@ -110,7 +110,7 @@ void doDiff(int argc, char *argv[]) {
         //strcat(r1, ".txt");
     }
     if (Debug)cout << r1 << endl;
-    if (argv[argc - 1] != "-") {
+    if (strcmp(argv[argc - 1] ,"-")!=0) {
         ifstream test2(r1);
         if (!test2) {
             cerr << "diff: " << argv[argc - 1] << ": No such file or directoty" << endl;
@@ -121,7 +121,7 @@ void doDiff(int argc, char *argv[]) {
             hang++;
         }
         maxlineb = hang - 1;
-    } else if (argv[argc - 2] != "-") {//文件二需要从标准输入读取
+    } else if (strcmp(argv[argc - 2],"-") !=0) {//文件二需要从标准输入读取
         int hang = 1;
         int y = 0;
         while (true) {

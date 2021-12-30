@@ -5,7 +5,7 @@
 #include <string>
 
 #define  MAXARG 20
-#define Develop true
+#define Develop false
 
 using namespace std;
 
@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
     system("clear");
     if (Develop) {
         string tmp = argv[0];
-        const regex parten("/((\\w|-|.)*/)*");
+        const regex parten("/((\\w|-|.)*/?)*");
         smatch path;
         if (regex_search(tmp, path, parten)) {
             memcpy(gTerm.root,path[0].str().c_str(),strlen(path[0].str().c_str()));

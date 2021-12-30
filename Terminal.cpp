@@ -195,14 +195,14 @@ void doCd(int argc, char *argv[]) {
         cout << "cd instruction is to change the working directory" << endl;
         cout << "The cd utility shall change the working directory of the current shell execution environment" << endl;
         cout << "use it like:\ncd /home/ect\n";
-    } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
+    } else if (regex_match(P, regex("/((\\w|-|.)*/?)*"))) {
         vector<string> lst = splitpath(P);
         if (!processpath(lst, final_path)) return;
         string tmp = combinepath(final_path);
         strcpy(gTerm.wdir, tmp.c_str());
         if (gTerm.wdir[strlen(gTerm.wdir) - 1] == '/' and strlen(gTerm.wdir) > 1)
             gTerm.wdir[strlen(gTerm.wdir) - 1] = '\0';
-    } else if (regex_match(P, regex("((\\w|-|.)+/)*(\\w|-|.)+/?"))) {
+    } else if (regex_match(P, regex("((\\w|-|.)*/?)*"))) {
         string abs = gTerm.wdir;
         abs += "/";
         abs += P;
@@ -307,7 +307,7 @@ inline void TestArg(int argc, char *argv[]) {
 void GetAccountInit() {
     string tmp = BasicInit("Machine Name:", regex("(_|[a-z]|[A-Z])\\w*"));
     memcpy(gTerm.mach, tmp.c_str(), strlen(tmp.c_str()));
-    tmp = BasicInit("Root Dir:", regex("/((\\w|-|.)*/)*(\\w|-|.)*/?"));
+    tmp = BasicInit("Root Dir:", regex("/((\\w|-|.)*/?)*"));
     memcpy(gTerm.root, tmp.c_str(), strlen(tmp.c_str()));
     if (strlen(gTerm.root) > 1 and gTerm.root[strlen(gTerm.root) - 1] == '/')gTerm.root[strlen(gTerm.root) - 1] = '\0';
     tmp = BasicInit("Login:", regex("(_|[a-z]|[A-Z])\\w*"));
