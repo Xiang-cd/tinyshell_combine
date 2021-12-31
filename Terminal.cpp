@@ -6,6 +6,7 @@
 Terminal gTerm;
 int Argc;
 char *Argv[MAXARG] = {};
+char tmp_for_p[MAXLINE] = {};
 
 vector<string> splitpath(string tmp) {
     vector<string> ans;
@@ -49,16 +50,15 @@ string combinepath(stack<string> final) {
 }
 
 static inline void p(string &a, bool last, bool line, int &num) {
-    char *tmp = new char[MAXLINE];
+    memset(tmp_for_p, 0, MAXLINE);
     if (line) {
-        if (last)sprintf(tmp, "%6d  %s$\n", num++, a.c_str());
-        else sprintf(tmp, "%6d  %s\n", num++, a.c_str());
+        if (last)sprintf(tmp_for_p, "%6d  %s$\n", num++, a.c_str());
+        else sprintf(tmp_for_p, "%6d  %s\n", num++, a.c_str());
     } else {
-        if (last)sprintf(tmp, "%s$\n", a.c_str());
-        else sprintf(tmp, "%s\n", a.c_str());
+        if (last)sprintf(tmp_for_p, "%s$\n", a.c_str());
+        else sprintf(tmp_for_p, "%s\n", a.c_str());
     }
-    strcat(gTerm.strout, tmp);
-    delete[]tmp;
+    strcat(gTerm.strout, tmp_for_p);
 }
 
 static inline void select_print_mode(bool *opts, string line, bool &last_empty, int &num) {
@@ -127,7 +127,8 @@ void doCat(int argc, char *argv[]) {
     }
     int num = 1;
     for (int i = 0; i < filelist.size(); ++i) {
-        string P = filelist[i];
+        string P;
+        P = filelist[i];
         stack<string> final_path;
         string tmp;
         if (regex_match(P, regex("-"))) {
@@ -148,13 +149,13 @@ void doCat(int argc, char *argv[]) {
                 select_print_mode(opts, lines[j], last_empty, num);
             }
             continue;
-        } else if (regex_match(P, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {
+        } else if (regex_match(P, regex("/((\\w|-|.)*/?)*(\\w|-|.)+"))) {
             string abs = gTerm.root;
             abs += P;
             vector<string> lst = splitpath(abs);
             if (!processpath(lst, final_path)) return;
             tmp = combinepath(final_path);
-        } else if (regex_match(P, regex("((\\w|-|.)+/)*(\\w|-|.)+"))) {
+        } else if (regex_match(P, regex("((\\w|-|.)*/?)*(\\w|-|.)+"))) {
             string abs = gTerm.root;
             abs += "/";
             abs += gTerm.wdir;
