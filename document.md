@@ -13,9 +13,7 @@
 
 ### 基本功能
 
-#### terminal框架
-
-#### 复合指令
+本项目通过解释器框架将输入的行分解为指令, 指令再依次分解为参数, 辨别调用的函数后, 将参数传给相应的函数, 同时对标准输入输出流进行操作, 达到模拟命令行的效果。具体的指令功能实现如下: 
 
 #### diff指令
 
@@ -220,17 +218,86 @@
 
 ##### echo指令
 
-##### 框架实现
 
-##### 复合指令
+
+##### 框架实现和复合指令
+
+根据需求文档, 进行以下架构的设计:
+
+1. 框架整体是一个死循环，不断等待通过getline来阻塞监听用户的输入，每读取输入的一行，则处理相应的用户输入，处理为命令和参数的形式。
+2. 对于读取到到每一行，先用正则表达式进行指令的分割（面向复合指令），再一次进行指令的选择调用。
+3. 每一条指令执行完毕，并且有下一条指令时，将strout拷贝到strin部分，标准输出部分清空。
+4. 到一行指令执行完毕，再将strout输出到屏幕，并将strout清空。
+
+实现细节方面, 主要分为指令分割和参数分割: 
+
+指令分割: 通过正则表达式分割后再用迭代器将分割结果交给下游处理
+
+```c++
+bool splitInstr(string tmp) {
+    bool flag = true;
+    regex parttern("\\|");//以'|'作为分割字符
+    sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
+    decltype(pos) end;
+    for (; pos != end; ++pos) {
+        proceseInstr(pos->str());
+        memcpy(gTerm.strin, gTerm.strout, MAXFILE);// 进行指令选择前将输出流拷贝到输入流,同时将输出流清空
+        memset(gTerm.strout, 0, MAXFILE);
+        bool tmpf = selectInstr(); //选择指令
+        flag = flag and tmpf; //如果遇到指令选择错误，则跳出指令的执行
+        if (not tmpf)cerr << "command \"" << Argv[0] << "\" not found!" << endl;
+    }
+    return flag;
+}
+```
+
+指令参数处理: 通过正则表达式, 利用空格或者空白符进行分割, 分割完成的参数写入全局变量`Argv[]`中, 通过记录参数个数`Argc`,最后进行指令的选择, 通过将`Argc`和`Argv[]`作为参数传入下游函数:
+
+```c++
+void proceseInstr(string tmp) {
+    Argc = 0;
+    regex parttern("\\s+");
+    tmp.erase(0, tmp.find_first_not_of(' '));//清除开头空白字符
+    sregex_token_iterator pos(tmp.begin(), tmp.end(), parttern, -1);
+    decltype(pos) end;
+    for (; pos != end; ++pos) { // 写入参数
+        memset(Argv[Argc], 0, sizeof(char) * MAXLINE);
+        memcpy(Argv[Argc], pos->str().c_str(), strlen(pos->str().c_str()));
+        Argc++;
+    }
+}
+```
+
+指令选择部分: 按第一个参数匹配命令, 最后进行相应函数的调用。
 
 ### part5
 
 ##### ls指令
 
+通过简单的系统调用实现实现当前文件夹中的内容, 如果文件夹不存在, 由系统提示错误。
+
+```c++
+void doLs() {
+    string root = gTerm.root;
+    string work = gTerm.wdir;
+    string ans = "ls " + root + work;
+    system(ans.c_str());
+}
+```
+
 ##### cls/clear指令
 
+通过系统调用达到清空屏幕的目的。
+
+```c++
+void doCls() {
+    system("clear");
+}
+```
+
 ##### change指令(主题切换)
+
+
 
 ##### vim指令(系统调用)
 

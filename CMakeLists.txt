@@ -3,4 +3,4 @@ project(total)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(total main.cpp doDIff.cpp doEcho.cpp doGrep.cpp fileProcess.cpp stringProcess.cpp Terminal.cpp doPwd.cpp doCp.cpp doTee.cpp)
+add_executable(total main.cpp doDIff.cpp doEcho.cpp doGrep.cpp fileProcess.cpp stringProcess.cpp Terminal.cpp doPwd.cpp doCp.cpp doTee.cpp additionalFuns.cpp additionalFuns.h doCat.cpp doCat.h)
