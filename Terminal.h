@@ -33,6 +33,8 @@ extern void doTee(int argc, char *argv[]);
 
 extern void doCat(int argc, char *argv[]);
 
+extern void doCd(int argc, char *argv[]);
+
 extern void doVim(int argc, char *argv[]);
 
 extern void doLs();
@@ -40,6 +42,7 @@ extern void doLs();
 extern void doCls();
 
 extern void doChange(int argc, char *argv[]);
+
 
 inline void printColor(const string &s, int front, int color, bool light);
 
