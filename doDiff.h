@@ -1,15 +1,20 @@
 
 #pragma once
-
+#include "Terminal.h"
+#include <stack>
+#include <vector>
+#include <regex>
 #include <iostream>
 #include <cstring>
 #include <fstream>
-#include "Terminal.h"
+
 #define  Debug true
 
 extern Terminal gTerm;
-
+extern vector<string> splitpath(string tmp);
+extern bool processpath(vector<string> lst, stack<string>& final_path);
+extern string combinepath(stack<string> final);
 bool test = false;
-void doDiff(int argc,char* argv[]);
+using namespace std;
 
-int choose(int a, int b,int maxlinea,int maxlineb,bool sameline[20][20],bool aim[20][20]);
+

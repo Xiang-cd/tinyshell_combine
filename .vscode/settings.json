@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "regex": "cpp",
+        "iostream": "cpp",
+        "vector": "cpp",
+        "chrono": "cpp",
+        "complex": "cpp"
+    }
+}
