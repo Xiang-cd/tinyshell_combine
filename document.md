@@ -91,7 +91,54 @@
 第一部分：准备工作
 
 1. 储存用户输入的特殊比较要求
+
+   ```c++
+   bool command[5] = {false};        //创建布尔数组储存用户是否有-b,-B等特殊要求
+       struct zifu {                           //储存用户是否有-I的要求
+           bool I = false;                             //是否有-I
+           char zifu[20] = {};                      //-I是什么
+       };
+       zifu command_I;     //初始化-I
+   
+   for (int i = 1; i < argc - 2; i++)           //在布尔数组里储存特殊要求
+       {
+           if (strcmp(argv[i], "-b") == 0) command[0] = true;         //[0]储存-b
+           else if (strcmp(argv[i], "-B") == 0) command[1] = true;         //[1]储存-B
+           else if (strcmp(argv[i], "-i") == 0) command[2] = true;         //[2]储存-i
+           else if (strcmp(argv[i], "-q") == 0) command[3] = true;         //[3]储存-q
+           else if (strcmp(argv[i], "-w") == 0) command[4] = true;         //[4]储存-w
+           else if (argv[i][0] == '-' && argv[i][1] == 'I') {
+               command_I.I = true;
+               strcpy(command_I.zifu, argv[i] + 2);
+           } else if (strcmp(argv[i], "--help") == 0);
+           else {
+               cerr << "diff: " << argv[i] << ": No such command" << endl;
+               return;
+           }
+       }
+   ```
+
+   ##### 
+
 2. 加工文件路径并打开文件，读取文件到file数组里
+
+   ```c++
+   if (!regex_match(P0, regex("-"))) {
+           ifstream test1(tmp0);
+           if (!test1) {
+               cerr << "diff: " << argv[argc - 2] << ": No such file or directoty" << endl;
+               return;
+           }
+           int hang = 1;
+           while (test1.getline(file1[hang], 500)) {
+               hang++;
+           }
+           maxlinea = hang - 1;
+       }
+   ```
+
+   ##### 
+
 3. 将文件复制一份到file_c数组里，所有的预处理都针对复制的文件进行
 
 第二部分：预处理
@@ -99,10 +146,81 @@
 1. 依次根据用户输入的特殊比较要求将复制的文件作出对应的操作，具体为：
 
 - -b：把所有连续的空格字符换成一个字符
+
+  ```c++
+  for (int i = 1; i <= maxlinea; i++) {
+              int j = 0;
+              while (file1_c[i][j] != '\n') {
+                  if (file1_c[i][j] == ' ') {//见到空格字符，把它后面紧挨着的空格字符全都去掉
+                      while (file1_c[i][j + 1] == ' ') {
+                          int k = j;
+                          while (file1_c[i][k] != '\n') {
+                              file1_c[i][k] = file1_c[i][k + 1];
+                              k++;
+                          }
+                          file1_c[i][k] = 0;
+                      }
+                  }
+                  j++;
+              }
+          }
+  ```
+
+  ##### 
+
 - -B：删除所有的空白行，同时用a[],b[]两个数组储存变换前后行的对应关系（即a[i]=j表示处理后文件的第i行对应着处理前文件的第j行）（如果没有执行- B，则a[i]=i）
+
+  ```c++
+  for (int i = 1; i <= maxlinea; i++) {
+              if (strcmp(file1_c[i], "\n") != 0) {//不是空白行，放到tempfile里
+                  strcpy(tempfile1[i - konga], file1_c[i]);
+              } else {//是空白行，不要它，但是a[j]需要发生对应的变化以保证tempfile第i行对应原文件的第a[i]行
+                  for (int j = i - konga++; j <= maxlinea; j++) {
+                      a[j] = j + konga;
+                  }
+              }
+          }
+  for (int i = 1; i <= maxlinea - konga; i++) {//tempfile回到file_c中
+          strcpy(file1_c[i], tempfile1[i]);
+      }
+  ```
+
+  ##### 
+
 - -i：利用ASKII码将所有小写字母换成大写字母
+
 - -w：删去所有的空格字符
+
 - -I[字符串]:将所有包含指定字符串的行换为指定字符串
+
+  ```c++
+  for (int i = 0; i <= 20; i++) {//先测出指定字符串的长度。
+              if (command_I.zifu[i] != '\0') {
+                  length++;
+              } else break;
+          }
+          for (int i = 1; i <= maxlinea; i++) {
+              int j = 0;
+              while (file1_c[i][j] != '\n') {   //可能引发越界，但不影响结果，因为目标字符串不会含有\n
+                  int tong = true;
+                  for (int k = 0; k < length; k++) {
+                      if (file1_c[i][j + k] != command_I.zifu[k]) {
+                          tong = false;
+                          break;
+                      }
+                  }
+                  if (tong) {//从j开始的length长度字符串恰好为目标
+                      strcpy(file1_c[i], command_I.zifu);
+                      strcat(file1_c[i], "\n\0");
+                      break;
+                  }
+                  j++;
+              }
+          }
+  ```
+
+  ##### 
+
 - 最后检查“-q"，若执行了它，遍历比较两个文件，遇到不同直接返回不同，否则返回空字符。
 
 第三部分：寻找最优解
@@ -113,15 +231,81 @@
 
 1. 首先统计行与行的相同关系，对于文件1中每一行，遍历文件2中每一行，判断是否相同并记录在sameline数组里（相同为1，不同为0）（在这里，展示了手动实现strcmp函数的过程)
 
+   ```c++
+   for (int i = 1; i <= maxlinea - konga; i++) {
+           for (int j = 1; j <= maxlineb - kongb; j++) {//测试文件一的第i行与文件二的第j行是否相同（手动实现strcmp)
+               bool same = true;
+               int spot = 0;
+               while (file1_c[i][spot] == file2_c[j][spot]) {
+                   if (file1_c[i][spot] == '\0') {
+                       break;
+                   }
+                   spot++;
+               }
+               if (file1_c[i][spot] != file2_c[j][spot]) same = false;
+               if (same) sameline[i][j] = 1;
+           }
+       }
+   ```
+
+   ##### 
+
 2. 创建remember数组，它的(i,j)元表示在行数不小于i且列数不小于j的范围中，能找到的目标行最多有几行。利用迭代算法，从后往前依次推导。
+
+   ```c++
+   for (int i = maxlinea; i >= 1; i--) {
+           for (int j = maxlineb; j >= 1; j--) {
+               if (sameline[i][j] == 0) {
+                   if (remember[i + 1][j] >= remember[i][j + 1]) {
+                       remember[i][j] = remember[i + 1][j];
+                   } else {
+                       remember[i][j] = remember[i][j + 1];
+                   }
+               } else {
+                   remember[i][j] = remember[i + 1][j + 1] + 1;
+               }
+           }
+       }
+   ```
+
+   ##### 
 
 3. 创建并获得aim数组，它储存了我们要找的目标行，最终输出完全按照它来进行。
 
-   实现方法：我们取出remember的第一个元素，它就是目标行的数量（设为x），从它开始，挑出sameline数组中的“1”。当且仅当取出这个“1”（假设它为i，j元）后，remember[i+1] [j+1]等于x-1时，这个“1”才是我们要找的1，aim中对应位置变成1，否则为0，继续寻找。当x减到0时，就获得了完整的aim。（remember的迭代过程保证了x最终一定会被减到0且这就是最优解）
+   实现方法：我们取出remember的第一个元素，它就是目标行的数量（设为x），从它开始，挑出sameline数组中的“1”。当且仅当取出这个“1”（假设它为i，j元）后，remember[i+1] [j+1]等于x-1时，这个“1”才是我们要找的1，aim中对应位置变成1，否则为0，继续寻找。当x减到0时，就获得了完整的aim。（remember的迭代过程保证了x最终一定会被减到0且这就是最优解。
+
+   ```c++
+   int a0 = remember[1][1];
+       int nowline = 1;
+       int nowrow = 1;
+       while (a0 > 0 && nowrow <= maxlineb && nowline <= maxlinea) {
+           bool have = false;
+           for (int i = nowrow; i <= maxlineb; i++) {
+               if (sameline[nowline][i] == 1) {
+                   have = true;
+                   if (remember[nowline][i] == a0) {
+                       aim[nowline][i] = 1;
+                       a0--;
+                       nowline++;
+                       nowrow = i + 1;
+                       break;
+                   } else {
+                       nowline++;
+                       break;
+                   }
+               }
+           }
+           if (!have) {
+               nowline++;
+           }
+       }
+   ```
+
+   ##### 
 
 第四部分：输出结果
 
-参照aim数组输出，aim中的1表示要不变的行，0表示需要删减的行。
+按照aim数组输出，aim中的1表示要不变的行，0表示需要删减的行。将删减信息放入strout即可。
 
 
 
@@ -397,6 +581,75 @@ Compare FILES line by line
  - w(--ignore - all - space) :ignore all white space
  - I(ignore - matching - lines = RE) :ignore changes where all lines match RE
  - q(--brief) :report only when files differ
-# a.txt中内容为
+ 
+ /Users/iMac-1/Github/tinyshell_combine
+//接下来的三组测试数据来展示diff对于特殊比较要求的处理
+# a.txt中内容为：
+# f i  rs t
+# second
+#
+# thi  r d
+
+# b.txt中内容为：
+# fir s   t
+#
+# seconnnnnd
+# THi r D
+1.diff -b -i -B a.txt b.txt:
+#输出：
+1d1
+<f i  rs t
+<second
+4a1
+>fir s   t
+>seconnnnnd
+2.diff -Isecon -w a.txt b.txt:
+#输出：
+2a2
+>
+3d4
+<
+<thi  r d
+4a4
+>THi r D
+3.diff -q -i -Isec -B -w a.txt b.txt:
+#输出：(按照特殊的比较要求，两个文件无差异，故无输出)
+
+
+//本组测试数据来直观展示diff输出行数尽可能少（a第一行与b最后一行相同，但为了行数最短，还是要将其删掉）
+# a.txt中内容为：
+# 9898
+# 2 2  2
+# 33
+# 
+# A
+# b.txt中内容为：
+# 222
+# 
+# 3   3
+# a
+# 9999
+diff -I9 -w -B -i a.txt b.txt:
+#输出：
+1d1
+<9898
+5a5
+>9999
+
+
+//最后，展示diff比较大文件的能力（几千行的文件可以瞬间输出比较结果）
+diff的复杂度足以撑住上千行的文件，由于输入输出过大，不在此详细展示，仅截取部分输出：
+diff doDiff.cpp doGrep.cpp:
+#部分输出：
+<        cout << endl;
+<        //system("pause");
+<    }
+490a212
+>                        strcat(gTerm.strout, colorLine(fileVec[i].contents[j], fileVec[i].matchPositions[j].first,
+>                                                       fileVec[i].matchPositions[j].second).c_str());
+>                        strcat(gTerm.strout, "\n");
+491d216
+<    if (command[3] == 1) {
+<        for (int i = 1; i <= maxlinea - konga; i++) {
 ```
 
