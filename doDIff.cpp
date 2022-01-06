@@ -14,22 +14,23 @@ static bool aim[hangshu][lieshu] = {};
 static int remember[hangshu][lieshu] = {};
 static char tempfile1[hangshu][lieshu] = {};
 static char tempfile2[hangshu][lieshu] = {};
-static inline void init(){
-    memset(file1,0,hangshu*lieshu);
-    memset(file2,0,hangshu*lieshu);
-    memset(file2_c,0,hangshu*lieshu);
-    memset(file2_c,0,hangshu*lieshu);
-    memset(a,0,hangshu);
-    memset(b,0,hangshu);
-    memset(sameline,0,hangshu*lieshu);
-    memset(aim,0,hangshu*lieshu);
-    memset(remember,0,hangshu*lieshu);
-    memset(tempfile1,0,hangshu*lieshu);
-    memset(tempfile2,0,hangshu*lieshu);
+
+static inline void init() {
+    memset(file1, 0, hangshu * lieshu);
+    memset(file2, 0, hangshu * lieshu);
+    memset(file2_c, 0, hangshu * lieshu);
+    memset(file2_c, 0, hangshu * lieshu);
+    memset(a, 0, hangshu);
+    memset(b, 0, hangshu);
+    memset(sameline, 0, hangshu * lieshu);
+    memset(aim, 0, hangshu * lieshu);
+    memset(remember, 0, hangshu * lieshu);
+    memset(tempfile1, 0, hangshu * lieshu);
+    memset(tempfile2, 0, hangshu * lieshu);
 }
+
 void doDiff(int argc, char *argv[]) {
     init();
-
     if (argc < 3 && strcmp(argv[1], "--help") != 0) {
         cerr << "diff：lack of arguments" << endl;
         return;
@@ -76,10 +77,10 @@ void doDiff(int argc, char *argv[]) {
         string tmp = argv[i];
         arguments.push_back(tmp);
     }
-    vector<string> filelist;  // filelist， 文件名的数组，详情看后面
+    vector<string> filelist;
     for (int i = 0; i < arguments.size(); ++i) {
         if (!regex_match(arguments[i], regex("-\\w+"))) {
-            if (regex_match(arguments[i], regex("--help"))) {    // --help 自己写吧，注意这里的处理形式是遍历，任何位置出现--help 都会直接提示
+            if (regex_match(arguments[i], regex("--help"))) {
                 strcpy(gTerm.strout,
                        "diff--help:\nCompare FILES line by line\n - b(ignore - space - change) :ignore changes in the amount of white space\n - B(ignore - blank - lines) :ignore changes where lines are all blank\n - i(ignore - case) :ignore case differences in file contents\n - w(--ignore - all - space) :ignore all white space\n - I(ignore - matching - lines = RE) :ignore changes where all lines match RE\n - q(--brief) :report only when files differ\n");
                 return;
@@ -386,7 +387,6 @@ void doDiff(int argc, char *argv[]) {
     }
 
 
-
     if (command[3] == 1) {
         for (int i = 1; i <= maxlinea - konga; i++) {
             int spot = 0;   //记录同一行中正在比较的位置
@@ -434,8 +434,6 @@ void doDiff(int argc, char *argv[]) {
     }
 
     //开始递归找最大值
-
-
     for (int i = maxlinea; i >= 1; i--) {
         for (int j = maxlineb; j >= 1; j--) {
             if (sameline[i][j] == 0) {

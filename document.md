@@ -766,21 +766,29 @@ cd ././//testcase/../testcase
 pwd
 
 # echo 验证
-echo hello world
+echo -n hello world
 
 # 串式验证diff 
-echo Merry days will come, believe.|diff - sample3.txt|cat -s -
+echo Merry days will come, believe.|diff - sample3.txt|cat -n -
 
-# 写入文件,匹配后输出
+# 选择验证diff的几个参数
+diff sample2.txt sample3.txt
+
+diff -b -B sample2.txt sample3.txt
+
+
+
+# 向标准输出写入文件,匹配后输出
 cat sample1.txt |grep y*u -|cat -n -s  -E -
 
 # 清屏
 cls
+
 # grep * 进行比较
 echo programDesigning | grep * -
 
 # 忽略大小写, 添加行号, 在每行前加文件名, 测试指令冲突, 冲突按后出现的
-grep -i -H -h -H -n  y..r sample1.txt
+grep -i -H -h -H -n  y..r sample2.txt
 
 # 加文件名和行号,无冲突
 grep -H -n you sample1.txt sample2.txt

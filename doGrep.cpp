@@ -4,12 +4,33 @@ extern Terminal gTerm;
 
 void doHelp() //grep --help 指令的实现，用于显示帮助
 {
-    ifstream fin;
-    fin.open("help.txt");
-    fin.seekg(0, fin.end);
-    int len = fin.tellg();
-    fin.seekg(0, fin.beg);
-    fin.read(gTerm.strout, len);
+    string a = "Usage: grep [OPTION]... PATTERNS [FILE]...\n"
+           "Search for PATTERNS in each FILE.\n"
+           "Example: grep -i 'hello world' menu.h main.c\n"
+           "PATTERNS can contain multiple patterns separated by newlines.\n"
+           "\n"
+           "Pattern selection and interpretation:\n"
+           "  -i, --ignore-case         ignore case distinctions in patterns and data\n"
+           "      --no-ignore-case      do not ignore case distinctions (default)\n"
+           "\n"
+           "Output control:\n"
+           "  -n, --line-number         print line number with output lines\n"
+           "      --line-buffered       flush output on every line\n"
+           "  -H, --with-filename       print file name with output lines\n"
+           "  -h, --no-filename         suppress the file name prefix on output\n"
+           "      --label=LABEL         use LABEL as the standard input file name prefix\n"
+           "  -c, --count               print only a count of selected lines per FILE\n"
+           "\n"
+           "Context control:\n"
+           "  -B, --before-context=NUM  print NUM lines of leading context\n"
+           "  -A, --after-context=NUM   print NUM lines of trailing context\n";
+//    ifstream fin;
+//    fin.open("help.txt");
+//    fin.seekg(0, fin.end);
+//    int len = fin.tellg();
+//    fin.seekg(0, fin.beg);
+//    fin.read(gTerm.strout, len);
+    memcpy(gTerm.strout,a.c_str(),a.size());
 }
 
 void init() //在每次解析命令行之前，先将c_flag,h_flag,i_flag,A_num,B_num初始化
