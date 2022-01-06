@@ -22,11 +22,15 @@ void doDiff(int argc, char *argv[]) {
     }
     //准备工作：
     bool command[5] = {false};        //创建布尔数组储存用户是否有-b,-B等特殊要求
-    struct zifu {                           //储存用户是否有-I的要求
-        bool I = false;                             //是否有-I
-        char zifu[20] = {};                      //-I是什么
+    struct zifu1 {//储存用户是否有-I的要求
+        zifu1() {
+            I = false;
+            memset(zifu, 0, 20);
+        }
+        bool I;                             //是否有-I
+        char zifu[20];                      //-I是什么
     };
-    zifu command_I;     //初始化-I
+    zifu1 command_I;     //初始化-I
 
     //bool opts[4] = { false }; // 这里是你的参数选项，对应与你的command数组, 改一下就好
     if (argc < 2) {   //这里是参数数量判断，这个
