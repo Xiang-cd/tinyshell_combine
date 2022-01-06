@@ -103,25 +103,25 @@ void doDiff(int argc, char *argv[]) {
         int y = 0;
         while (true) {
             int z = 0;
-            while (gTerm.strin[y] != '\n') {
-                *(file2[hang] + z) = gTerm.strin[y];
+            while (gTerm.strin[y] != '\n' and gTerm.strin[y] != '\0') {
+                *(file1[hang] + z) = gTerm.strin[y];
                 y++;
                 z++;
             }
             hang++;
-            y++;
             if (gTerm.strin[y] == '\0') {
                 break;
             }
+            y++;
         }
         maxlinea = hang - 1;
-    } else if (regex_match(P0, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {  // 这里是指根目录的情况
-        string abs = gTerm.root;  // 先封装成string
-        abs += P0;   // p就是你要处理的参数，在你那里是取filelsit【0】
+    } else if (regex_match(P0, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {
+        string abs = gTerm.root;
+        abs += P0;
         vector<string> lst = splitpath(abs); // 调用分割函数，会将路径分割成每一级
         if (!processpath(lst, final_path)) return;  // 处理路径，合并// . 等选项，如果出现非法路径，会自动报错，所以要保留
         tmp0 = combinepath(final_path); //合并路径，将路径各级选项合并，赋值给tmp，最后你只要打开tmp这个字符串就可以了
-    } else if (regex_match(P0, regex("((\\w|-|.)+/)*(\\w|-|.)+"))) { // 这里是指相对路径的情况
+    } else if (regex_match(P0, regex("((\\w|-|.)+/)*(\\w|-|.)+"))) {
         string abs = gTerm.root;
         abs += "/";
         abs += gTerm.wdir;
@@ -133,27 +133,27 @@ void doDiff(int argc, char *argv[]) {
     } else {
         cerr << "invalid path or file!" << endl;
     }
-    tmp0 = tmp0.substr(0, tmp0.length() - 1);  // 但是要注意这里，合并完之后的最后一个字符是‘/’, 所以我吧它去掉了
+    tmp0 = tmp0.substr(0, tmp0.length() - 1);
 
 
     string P1 = filelist[1];
     stack<string> final_path2;
     string tmp1;
-    if (regex_match(P1, regex("-"))) {   // 这里是文件是-的情况，也就是标准输入流， 自己处理
+    if (regex_match(P1, regex("-"))) {
         int hang = 1;
         int y = 0;
         while (true) {
             int z = 0;
-            while (gTerm.strin[y] != '\n') {
+            while (gTerm.strin[y] != '\n' and gTerm.strin[y] != '\0') {
                 *(file2[hang] + z) = gTerm.strin[y];
                 y++;
                 z++;
             }
             hang++;
-            y++;
             if (gTerm.strin[y] == '\0') {
                 break;
             }
+            y++;
         }
         maxlineb = hang - 1;
     } else if (regex_match(P1, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {  // 这里是指根目录的情况
@@ -174,9 +174,7 @@ void doDiff(int argc, char *argv[]) {
     } else {
         cerr << "invalid path or file!" << endl;
     }
-    tmp1 = tmp1.substr(0, tmp1.length() - 1);  // 但是要注意这里，合并完之后的最后一个字符是‘/’, 所以我吧它去掉了
-
-
+    tmp1 = tmp1.substr(0, tmp1.length() - 1);
 
     if (!regex_match(P0, regex("-"))) {
         ifstream test1(tmp0);
