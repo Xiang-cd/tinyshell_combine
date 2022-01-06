@@ -5,6 +5,9 @@ void doPwd(int argc, char *argv[]) {
         cerr << "pwd: Print the name of the current working dirctory." << endl;
         return;
     }
+    if (argc>1){
+        cerr<<"too many argument!"<<endl;
+    }
     strcat(gTerm.strout, gTerm.wdir);
     strcat(gTerm.strout, "\n");
 }

@@ -101,6 +101,9 @@
 - 指令语法: cp {-n}\[文件1\]\[文件2\]
 - **参数说明:**
   - -n：不覆盖已存在的文件
+- **输入非法处理:**
+  - 指令不完整 未完整输入源文件和目标文件
+  
 
 #### cd指令
 
@@ -538,13 +541,8 @@
 本指令可将标准输入输出至标准输出，同时复制到若干文件。
 
 1. 利用字符串复制将strin复制到strout。
-
-```c++
-strcpy(gTerm.strout, gTerm.strin);
-```
-
-1. 将strin读到一个二维char数组中，见到`\n`就换行。
-2. 将char数组依次输出到用户指定的若干个文件中（如果执行了`-a`指令，先尝试打开文件，打开失败则报错，否则接在打开的件后）。
+2. 将strin读到一个二维char数组中，见到`\n`就换行。
+3. 将char数组依次输出到用户指定的若干个文件中（如果执行了`-a`指令，先尝试打开文件，打开失败则报错，否则接在打开的件后）。
 
 ##### cat指令
 
@@ -600,15 +598,44 @@ static inline void select_print_mode(bool *opts, string line, bool &last_empty, 
 
 ##### cp指令
 
+* **整体构思**
 
+  先将工作目录和根目录进行拼接，再以相应的方式打开文件并写入。
+
+* -n模式
+
+  以ios::app模式打开文件
+
+* 不带-n模式
+
+  以默认方式打开文件
 
 ##### cd指令
+
+通过简单的参数数量判别参数数量的合法性, 随后通过正则表达式验证路径是否合法, 是否是相对路径或者绝对路径, 随后进行路径的拼接和处理工作, 最后将结果路径写入`gTerm.wdri`。
+
+```c++
+if (regex_match(P, regex("--help"))) {
+   // 显示帮助
+} else if (regex_match(P, regex("/((\\w|-|.)*/?)*"))) {
+    //绝对路径处理方式
+} else if (regex_match(P, regex("((\\w|-|.)*/?)*"))) {
+    //相对路径处理
+} else { // 报错
+    cerr << "invalid path!" << endl;
+}=
+```
 
 
 
 ##### pwd指令
 
+经过简单的参数判断和验证, 一切正常后, 将`gTerm.wdir`复制到`gTerm.strout`即可。
 
+```c+
+strcat(gTerm.strout, gTerm.wdir);
+strcat(gTerm.strout, "\n");
+```
 
 ### part4
 
@@ -730,12 +757,45 @@ inline void printColor(const string &s, int front, int color, bool light = false
 Machine Name:mac
 Root Directory: #相应工作目录
 Login:usr
+
+# 显示当前文件列表
 ls
+# 进入测试文件夹
+cd ././//testcase/../testcase
+
+# 查看当前工作路径
 pwd
-echo hello|grep hel -|cat -n -
-echo hello|diff - a.txt|cat -s -
+
+# echo 验证
+echo hello world
+
+# 串式验证,
+echo Merry days will come, believe.|diff - sample3.txt|cat -s -
+
+# 
 cat a.txt |grep di -|cat -n -s  -E -
+
+# 清屏
 cls
+
+echo programDesigning | grep * -
+
+grep -i -H -h -H -n .i sample1.txt
+
+grep -H -n you sample1.txt sample2.txt
+
+#echo将"added"写入标准输出,tee指令将标准输入输出到标准输出中，并不覆盖地输出到文件a中；再将a文件不覆盖地复制到文件b中
+#最后将a与b非空行编号，合并连续空行，在每行末尾附上$符号，逐行输出到标准输出中
+echo added|tee -a sample1.txt|cp -n sample1.txt sample4.txt|cat -b -s -E sample3.txt sample4.txt 
+
+
+# 切换主题
+change 1
+
+# 进入vim
+vim
+
+
 
 ```
 
@@ -756,7 +816,6 @@ Compare FILES line by line
  - I(ignore - matching - lines = RE) :ignore changes where all lines match RE
  - q(--brief) :report only when files differ
  
- /Users/iMac-1/Github/tinyshell_combine
 //接下来的三组测试数据来展示diff对于特殊比较要求的处理
 # a.txt中内容为：
 # f i  rs t

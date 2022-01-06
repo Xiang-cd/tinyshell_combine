@@ -5,9 +5,6 @@ char file111[1000][MAXLINE] = {0};
 
 void doTee(int argc, char *argv[]) {
     strcpy(gTerm.strout, gTerm.strin);
-    if (debug) {
-        cout << gTerm.strout;
-    }
     if (argc == 1) return;
     bool command = false;
     int i = 1;//循环变量
@@ -33,12 +30,6 @@ void doTee(int argc, char *argv[]) {
         }
     }
     maxline = hang - 1;
-
-    if (debug) {
-        for (int j = 1; j <= maxline; j++) {
-            cout << file111[j] << endl;
-        }
-    }
 
     char r1[100] = {0}, w1[100] = {0};
     strcpy(w1, gTerm.wdir);
