@@ -27,6 +27,7 @@ void doDiff(int argc, char *argv[]) {
             I = false;
             memset(zifu, 0, 20);
         }
+
         bool I;                             //是否有-I
         char zifu[20];                      //-I是什么
     };
@@ -162,11 +163,6 @@ void doDiff(int argc, char *argv[]) {
     tmp1 = tmp1.substr(0, tmp1.length() - 1);  // 但是要注意这里，合并完之后的最后一个字符是‘/’, 所以我吧它去掉了
 
 
-    if (test) {
-        cout << tmp0 << endl;
-        cout << tmp1 << endl;
-        //system("pause");
-    }
 
     if (!regex_match(P0, regex("-"))) {
         ifstream test1(tmp0);
@@ -201,26 +197,6 @@ void doDiff(int argc, char *argv[]) {
         strcat(file2[i], "\n");
     }
 
-    if (test) {
-        //输出记录结果测试：
-        for (int i = 0; i <= 4; i++) {
-            cout << command[i] << endl;
-        }
-        cout << command_I.I << " " << command_I.zifu << endl;
-        //system("pause");
-    }
-    //文件读取测试
-    if (test) {
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2[i];
-        }
-        cout << endl;
-    }
-
     //开始预处理文件，第一步：复制一份
 
     for (int i = 0; i < hangshu; i++) {
@@ -230,19 +206,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    //文件复制测试
-    if (test) {
-        cout << "文件复制测试" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
 
     if (command[4] == 1) {    //忽略全部空格字符
         for (int i = 1; i <= maxlinea; i++) {
@@ -273,20 +236,6 @@ void doDiff(int argc, char *argv[]) {
                 if (file2_c[i][j] != ' ' && file2_c[i][j] != '\n')j++;
             }
         }
-    }
-
-    if (test) {
-        //文件预处理测试
-        cout << "忽略所有空格" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
     }
 
     if (command[0] == 1) {    //不检查空格字符的不同
@@ -324,20 +273,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //文件预处理测试
-        cout << "不检查空格字符的不同" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
-
 
     if (command[2] == 1) {    //不检查大小写
         for (int i = 0; i < hangshu; i++) {
@@ -357,19 +292,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //文件预处理测试
-        cout << "不检查大小写" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
 
     if (command_I.I == 1) {    //含有指定字符串视为相同。
         int length = 0;
@@ -415,20 +337,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //文件预处理测试
-        cout << "含有" << command_I.zifu << "视为相同" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
-
 
     int konga = 0, kongb = 0;
 
@@ -465,32 +373,7 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //a[i]与b[i]对应关系测试
-        cout << "不检查空白行" << endl;
-        for (int i = 1; i <= maxlinea - konga; i++) {
-            cout << a[i] << endl;
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb - kongb; i++) {
-            cout << b[i] << endl;
-        }
-        cout << endl;
-        //system("pause");
-    }
 
-    //文件预处理测试
-    if (test) {
-        for (int i = 1; i <= maxlinea - konga; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb - kongb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
 
     if (command[3] == 1) {
         for (int i = 1; i <= maxlinea - konga; i++) {
@@ -538,17 +421,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //统计结果测试
-        cout << "统计结果测试" << endl;
-        for (int i = 1; i <= maxlinea - konga; i++) {
-            for (int j = 1; j <= maxlineb - kongb; j++) {
-                cout << sameline[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }
-
     //开始递归找最大值
 
 
@@ -590,20 +462,6 @@ void doDiff(int argc, char *argv[]) {
         if (!have) {
             nowline++;
         }
-    }
-
-
-    if (test) {
-        //测试目标结果
-        cout << "寻找最优解测试" << endl;
-        cout << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            for (int j = 1; j <= maxlineb; j++) {
-                cout << aim[i][j] << " ";
-            }
-            cout << endl;
-        }
-        //system("pause");
     }
 
     //开始输出：

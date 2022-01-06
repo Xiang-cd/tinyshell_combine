@@ -1,6 +1,7 @@
 #include "doTee.h"
 
 bool debug = false;
+char file111[1000][MAXLINE] = {0};
 
 void doTee(int argc, char *argv[]) {
     strcpy(gTerm.strout, gTerm.strin);
@@ -15,16 +16,13 @@ void doTee(int argc, char *argv[]) {
         i++;//第二个输入是指令，从下一个开始循环
     }
     //开始读取信息到file1里
-    //string temp = gTerm.strin;
-    //cout<<temp<<endl;
-    char file1[100][100] = {0};
     int hang = 1;
     int y = 0;
     int maxline = 0;
     while (true) {
         int z = 0;
         while (gTerm.strin[y] != '\n' and gTerm.strin[y] != '\0') {
-            *(file1[hang] + z) = gTerm.strin[y];
+            *(file111[hang] + z) = gTerm.strin[y];
             y++;
             z++;
         }
@@ -38,25 +36,13 @@ void doTee(int argc, char *argv[]) {
 
     if (debug) {
         for (int j = 1; j <= maxline; j++) {
-            cout << file1[j] << endl;
+            cout << file111[j] << endl;
         }
     }
 
     char r1[100] = {0}, w1[100] = {0};
     strcpy(w1, gTerm.wdir);
     for (; i < argc; i++) {
-        /*
-        if (argv[i][0] == '/') {//根目录
-            strcpy(r1, gTerm.root);
-            strcat(r1, argv[i]);
-            //strcat(r1, ".txt");
-        } else {//相对路径
-            strcpy(r1, w1);
-            //strcat(r1, "/");
-            strcat(r1, argv[i]);
-            //strcat(r1, ".txt");
-        }
-         */
         string P1 = argv[i];
         stack<string> final_path2;
         string tmp1;
@@ -80,7 +66,6 @@ void doTee(int argc, char *argv[]) {
         }
         tmp1 = tmp1.substr(0, tmp1.length() - 1);  // 但是要注意这里，合并完之后的最后一个字符是‘/’, 所以我吧它去掉了
 
-
         if (debug) {
             cout << "路径：" << endl << tmp1 << endl;
         }
@@ -93,14 +78,14 @@ void doTee(int argc, char *argv[]) {
                 ceshi.close();
                 ofstream wenjian(tmp1, ios::app);
                 for (int j = 1; j <= maxline; j++) {
-                    wenjian << file1[j] << endl;
+                    wenjian << file111[j] << endl;
                 }
                 wenjian.close();
             }
         } else {
             ofstream wenjian(tmp1);
             for (int j = 1; j <= maxline; j++) {
-                wenjian << file1[j] << endl;
+                wenjian << file111[j] << endl;
             }
             wenjian.close();
         }
