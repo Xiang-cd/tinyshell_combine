@@ -769,19 +769,21 @@ pwd
 # echo 验证
 echo hello world
 
-# 串式验证,
+# 串式验证diff 
 echo Merry days will come, believe.|diff - sample3.txt|cat -s -
 
-# 
-cat a.txt |grep di -|cat -n -s  -E -
+# 写入文件,匹配后输出
+cat sample1.txt |grep y*u -|cat -n -s  -E -
 
 # 清屏
 cls
-
+# grep * 进行比较
 echo programDesigning | grep * -
 
-grep -i -H -h -H -n .i sample1.txt
+# 忽略大小写, 添加行号, 在每行前加文件名, 测试指令冲突, 冲突按后出现的
+grep -i -H -h -H -n  y..r sample1.txt
 
+# 加文件名和行号,无冲突
 grep -H -n you sample1.txt sample2.txt
 
 #echo将"added"写入标准输出,tee指令将标准输入输出到标准输出中，并不覆盖地输出到文件a中；再将a文件不覆盖地复制到文件b中
@@ -794,6 +796,9 @@ change 1
 
 # 进入vim
 vim
+
+# 退出
+exit
 
 
 
