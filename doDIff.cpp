@@ -3,19 +3,33 @@
 #include"doDiff.h"
 
 const int hangshu = 5000, lieshu = 5000;//可根据需要修改
-char file1[hangshu][lieshu] = {};
-char file2[hangshu][lieshu] = {};
-char file1_c[hangshu][lieshu] = {};
-char file2_c[hangshu][lieshu] = {};
-int a[hangshu] = {}, b[hangshu] = {};
-bool sameline[hangshu][lieshu] = {};
-bool aim[hangshu][lieshu] = {};
+static char file1[hangshu][lieshu] = {};
+static char file2[hangshu][lieshu] = {};
+static char file1_c[hangshu][lieshu] = {};
+static char file2_c[hangshu][lieshu] = {};
+static int a[hangshu] = {}, b[hangshu] = {};
+static bool sameline[hangshu][lieshu] = {};
+static bool aim[hangshu][lieshu] = {};
 //memset(aim, 0, 20 * 20);
-int remember[hangshu][lieshu] = {};
-char tempfile1[hangshu][lieshu] = {};
-char tempfile2[hangshu][lieshu] = {};
-
+static int remember[hangshu][lieshu] = {};
+static char tempfile1[hangshu][lieshu] = {};
+static char tempfile2[hangshu][lieshu] = {};
+static inline void init(){
+    memset(file1,0,hangshu*lieshu);
+    memset(file2,0,hangshu*lieshu);
+    memset(file2_c,0,hangshu*lieshu);
+    memset(file2_c,0,hangshu*lieshu);
+    memset(a,0,hangshu);
+    memset(b,0,hangshu);
+    memset(sameline,0,hangshu*lieshu);
+    memset(aim,0,hangshu*lieshu);
+    memset(remember,0,hangshu*lieshu);
+    memset(tempfile1,0,hangshu*lieshu);
+    memset(tempfile2,0,hangshu*lieshu);
+}
 void doDiff(int argc, char *argv[]) {
+    init();
+
     if (argc < 3 && strcmp(argv[1], "--help") != 0) {
         cerr << "diff：lack of arguments" << endl;
         return;
