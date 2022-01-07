@@ -11,9 +11,11 @@ void doCd(int argc, char *argv[]) {
     string P = argv[1];
     stack<string> final_path;
     if (regex_match(P, regex("--help"))) {
-        cout << "cd instruction is to change the working directory" << endl;
-        cout << "The cd utility shall change the working directory of the current shell execution environment" << endl;
-        cout << "use it like:\ncd /home/ect\n";
+        string outs =
+                "cd instruction is to change the working directory"
+                "The cd utility shall change the working directory of the current shell execution environment"
+                "use it like:\ncd /home/ect\n";
+        memcpy(gTerm.strout,outs.c_str(),outs.size());
     } else if (regex_match(P, regex("/((\\w|-|.)*/?)*"))) {
         vector<string> lst = splitpath(P);
         if (!processpath(lst, final_path)) return;

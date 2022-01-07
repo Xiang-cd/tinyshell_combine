@@ -3,30 +3,50 @@
 #include"doDiff.h"
 
 const int hangshu = 5000, lieshu = 5000;//可根据需要修改
-char file1[hangshu][lieshu] = {};
-char file2[hangshu][lieshu] = {};
-char file1_c[hangshu][lieshu] = {};
-char file2_c[hangshu][lieshu] = {};
-int a[hangshu] = {}, b[hangshu] = {};
-bool sameline[hangshu][lieshu] = {};
-bool aim[hangshu][lieshu] = {};
+static char file1[hangshu][lieshu] = {};
+static char file2[hangshu][lieshu] = {};
+static char file1_c[hangshu][lieshu] = {};
+static char file2_c[hangshu][lieshu] = {};
+static int a[hangshu] = {}, b[hangshu] = {};
+static bool sameline[hangshu][lieshu] = {};
+static bool aim[hangshu][lieshu] = {};
 //memset(aim, 0, 20 * 20);
-int remember[hangshu][lieshu] = {};
-char tempfile1[hangshu][lieshu] = {};
-char tempfile2[hangshu][lieshu] = {};
+static int remember[hangshu][lieshu] = {};
+static char tempfile1[hangshu][lieshu] = {};
+static char tempfile2[hangshu][lieshu] = {};
+
+static inline void init() {
+    memset(file1, 0, hangshu * lieshu);
+    memset(file2, 0, hangshu * lieshu);
+    memset(file2_c, 0, hangshu * lieshu);
+    memset(file2_c, 0, hangshu * lieshu);
+    memset(a, 0, hangshu);
+    memset(b, 0, hangshu);
+    memset(sameline, 0, hangshu * lieshu);
+    memset(aim, 0, hangshu * lieshu);
+    memset(remember, 0, hangshu * lieshu);
+    memset(tempfile1, 0, hangshu * lieshu);
+    memset(tempfile2, 0, hangshu * lieshu);
+}
 
 void doDiff(int argc, char *argv[]) {
+    init();
     if (argc < 3 && strcmp(argv[1], "--help") != 0) {
         cerr << "diff：lack of arguments" << endl;
         return;
     }
     //准备工作：
     bool command[5] = {false};        //创建布尔数组储存用户是否有-b,-B等特殊要求
-    struct zifu {                           //储存用户是否有-I的要求
-        bool I = false;                             //是否有-I
-        char zifu[20] = {};                      //-I是什么
+    struct zifu1 {//储存用户是否有-I的要求
+        zifu1() {
+            I = false;
+            memset(zifu, 0, 20);
+        }
+
+        bool I;                             //是否有-I
+        char zifu[20];                      //-I是什么
     };
-    zifu command_I;     //初始化-I
+    zifu1 command_I;     //初始化-I
 
     //bool opts[4] = { false }; // 这里是你的参数选项，对应与你的command数组, 改一下就好
     if (argc < 2) {   //这里是参数数量判断，这个
@@ -57,10 +77,10 @@ void doDiff(int argc, char *argv[]) {
         string tmp = argv[i];
         arguments.push_back(tmp);
     }
-    vector<string> filelist;  // filelist， 文件名的数组，详情看后面
+    vector<string> filelist;
     for (int i = 0; i < arguments.size(); ++i) {
         if (!regex_match(arguments[i], regex("-\\w+"))) {
-            if (regex_match(arguments[i], regex("--help"))) {    // --help 自己写吧，注意这里的处理形式是遍历，任何位置出现--help 都会直接提示
+            if (regex_match(arguments[i], regex("--help"))) {
                 strcpy(gTerm.strout,
                        "diff--help:\nCompare FILES line by line\n - b(ignore - space - change) :ignore changes in the amount of white space\n - B(ignore - blank - lines) :ignore changes where lines are all blank\n - i(ignore - case) :ignore case differences in file contents\n - w(--ignore - all - space) :ignore all white space\n - I(ignore - matching - lines = RE) :ignore changes where all lines match RE\n - q(--brief) :report only when files differ\n");
                 return;
@@ -84,25 +104,25 @@ void doDiff(int argc, char *argv[]) {
         int y = 0;
         while (true) {
             int z = 0;
-            while (gTerm.strin[y] != '\n') {
-                *(file2[hang] + z) = gTerm.strin[y];
+            while (gTerm.strin[y] != '\n' and gTerm.strin[y] != '\0') {
+                *(file1[hang] + z) = gTerm.strin[y];
                 y++;
                 z++;
             }
             hang++;
-            y++;
             if (gTerm.strin[y] == '\0') {
                 break;
             }
+            y++;
         }
         maxlinea = hang - 1;
-    } else if (regex_match(P0, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {  // 这里是指根目录的情况
-        string abs = gTerm.root;  // 先封装成string
-        abs += P0;   // p就是你要处理的参数，在你那里是取filelsit【0】
+    } else if (regex_match(P0, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {
+        string abs = gTerm.root;
+        abs += P0;
         vector<string> lst = splitpath(abs); // 调用分割函数，会将路径分割成每一级
         if (!processpath(lst, final_path)) return;  // 处理路径，合并// . 等选项，如果出现非法路径，会自动报错，所以要保留
         tmp0 = combinepath(final_path); //合并路径，将路径各级选项合并，赋值给tmp，最后你只要打开tmp这个字符串就可以了
-    } else if (regex_match(P0, regex("((\\w|-|.)+/)*(\\w|-|.)+"))) { // 这里是指相对路径的情况
+    } else if (regex_match(P0, regex("((\\w|-|.)+/)*(\\w|-|.)+"))) {
         string abs = gTerm.root;
         abs += "/";
         abs += gTerm.wdir;
@@ -114,27 +134,27 @@ void doDiff(int argc, char *argv[]) {
     } else {
         cerr << "invalid path or file!" << endl;
     }
-    tmp0 = tmp0.substr(0, tmp0.length() - 1);  // 但是要注意这里，合并完之后的最后一个字符是‘/’, 所以我吧它去掉了
+    tmp0 = tmp0.substr(0, tmp0.length() - 1);
 
 
     string P1 = filelist[1];
     stack<string> final_path2;
     string tmp1;
-    if (regex_match(P1, regex("-"))) {   // 这里是文件是-的情况，也就是标准输入流， 自己处理
+    if (regex_match(P1, regex("-"))) {
         int hang = 1;
         int y = 0;
         while (true) {
             int z = 0;
-            while (gTerm.strin[y] != '\n') {
+            while (gTerm.strin[y] != '\n' and gTerm.strin[y] != '\0') {
                 *(file2[hang] + z) = gTerm.strin[y];
                 y++;
                 z++;
             }
             hang++;
-            y++;
             if (gTerm.strin[y] == '\0') {
                 break;
             }
+            y++;
         }
         maxlineb = hang - 1;
     } else if (regex_match(P1, regex("/((\\w|-|.)+/)*(\\w|-|.)+"))) {  // 这里是指根目录的情况
@@ -155,14 +175,7 @@ void doDiff(int argc, char *argv[]) {
     } else {
         cerr << "invalid path or file!" << endl;
     }
-    tmp1 = tmp1.substr(0, tmp1.length() - 1);  // 但是要注意这里，合并完之后的最后一个字符是‘/’, 所以我吧它去掉了
-
-
-    if (test) {
-        cout << tmp0 << endl;
-        cout << tmp1 << endl;
-        //system("pause");
-    }
+    tmp1 = tmp1.substr(0, tmp1.length() - 1);
 
     if (!regex_match(P0, regex("-"))) {
         ifstream test1(tmp0);
@@ -197,26 +210,6 @@ void doDiff(int argc, char *argv[]) {
         strcat(file2[i], "\n");
     }
 
-    if (test) {
-        //输出记录结果测试：
-        for (int i = 0; i <= 4; i++) {
-            cout << command[i] << endl;
-        }
-        cout << command_I.I << " " << command_I.zifu << endl;
-        //system("pause");
-    }
-    //文件读取测试
-    if (test) {
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2[i];
-        }
-        cout << endl;
-    }
-
     //开始预处理文件，第一步：复制一份
 
     for (int i = 0; i < hangshu; i++) {
@@ -226,19 +219,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    //文件复制测试
-    if (test) {
-        cout << "文件复制测试" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
 
     if (command[4] == 1) {    //忽略全部空格字符
         for (int i = 1; i <= maxlinea; i++) {
@@ -269,20 +249,6 @@ void doDiff(int argc, char *argv[]) {
                 if (file2_c[i][j] != ' ' && file2_c[i][j] != '\n')j++;
             }
         }
-    }
-
-    if (test) {
-        //文件预处理测试
-        cout << "忽略所有空格" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
     }
 
     if (command[0] == 1) {    //不检查空格字符的不同
@@ -320,20 +286,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //文件预处理测试
-        cout << "不检查空格字符的不同" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
-
 
     if (command[2] == 1) {    //不检查大小写
         for (int i = 0; i < hangshu; i++) {
@@ -353,19 +305,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //文件预处理测试
-        cout << "不检查大小写" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
 
     if (command_I.I == 1) {    //含有指定字符串视为相同。
         int length = 0;
@@ -411,20 +350,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //文件预处理测试
-        cout << "含有" << command_I.zifu << "视为相同" << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
-
 
     int konga = 0, kongb = 0;
 
@@ -461,32 +386,6 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //a[i]与b[i]对应关系测试
-        cout << "不检查空白行" << endl;
-        for (int i = 1; i <= maxlinea - konga; i++) {
-            cout << a[i] << endl;
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb - kongb; i++) {
-            cout << b[i] << endl;
-        }
-        cout << endl;
-        //system("pause");
-    }
-
-    //文件预处理测试
-    if (test) {
-        for (int i = 1; i <= maxlinea - konga; i++) {
-            cout << file1_c[i];
-        }
-        cout << endl;
-        for (int i = 1; i <= maxlineb - kongb; i++) {
-            cout << file2_c[i];
-        }
-        cout << endl;
-        //system("pause");
-    }
 
     if (command[3] == 1) {
         for (int i = 1; i <= maxlinea - konga; i++) {
@@ -534,20 +433,7 @@ void doDiff(int argc, char *argv[]) {
         }
     }
 
-    if (test) {
-        //统计结果测试
-        cout << "统计结果测试" << endl;
-        for (int i = 1; i <= maxlinea - konga; i++) {
-            for (int j = 1; j <= maxlineb - kongb; j++) {
-                cout << sameline[i][j] << " ";
-            }
-            cout << endl;
-        }
-    }
-
     //开始递归找最大值
-
-
     for (int i = maxlinea; i >= 1; i--) {
         for (int j = maxlineb; j >= 1; j--) {
             if (sameline[i][j] == 0) {
@@ -586,20 +472,6 @@ void doDiff(int argc, char *argv[]) {
         if (!have) {
             nowline++;
         }
-    }
-
-
-    if (test) {
-        //测试目标结果
-        cout << "寻找最优解测试" << endl;
-        cout << endl;
-        for (int i = 1; i <= maxlinea; i++) {
-            for (int j = 1; j <= maxlineb; j++) {
-                cout << aim[i][j] << " ";
-            }
-            cout << endl;
-        }
-        //system("pause");
     }
 
     //开始输出：

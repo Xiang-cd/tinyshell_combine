@@ -66,12 +66,13 @@ void doCat(int argc, char *argv[]) {
                 return;
             }
         } else if (regex_match(arguments[i], regex("--help"))) {
-            cout << "cat - concatenate files and print on the standard output\n";
-            cout << "With no FILE, or when FILE is -, read standard input.\n";
-            cout << "-n with line number\n";
-            cout << "-b with line number, but no number for empty line\n";
-            cout << "-s only print one empty line if there are continues empty lines\n";
-            cout << "-E each line end with '$'\n";
+            string outs = "cat - concatenate files and print on the standard output\n"
+                          "With no FILE, or when FILE is -, read standard input.\n"
+                          "-n with line number\n"
+                          "-b with line number, but no number for empty line\n"
+                          "-s only print one empty line if there are continues empty lines\n"
+                          "-E each line end with '$'\n";
+            memcpy(gTerm.strout,outs.c_str(),outs.size());
             return;
         } else {
             filelist.push_back(arguments[i]);

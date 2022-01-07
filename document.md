@@ -5,17 +5,20 @@
 
 ### 成员列表
 
-- 项晨东 计04
-
-- 冯宁亚
-- 李晨宁
-- 周晋 计13
+- 项晨东 2019011831 计04
+- 冯宁亚 2021011831 软13
+- 李晨宇 2020011366 软13
+- 周晋 2021010743 计13
 
 ### 分工情况
 
-冯宁亚——diff
+冯宁亚 part1
 
+李晨宇 part2
 
+周晋 part3
+
+项晨东 part4
 
 ## 功能实现
 
@@ -25,8 +28,8 @@
 
 #### diff指令
 
-- 指令语法：diff {-b}{-B}{-i}{-p}{-w}{-I[字符串]}[文件1] [文件2]
 - 获取帮助 diff --help
+- 指令语法：diff {-b}{-B}{-i}{-p}{-w}{-I[字符串]}[文件1] [文件2]
 - 输出：比较文件1和文件2，输出如何通过最少次增删行将文件1变成文件2
 - **特殊比较规则如下**
   - -b：不检查空格字符的不同（连续的空格和一个空格视为相同）
@@ -35,7 +38,6 @@
   - -q：仅显示有无差异，不显示详细信息。无差异时不显示，有差异时输出“File [] and [] differ".
   - -w: 忽略全部空格字符
   - -I[字符串] :含有[字符串]的行全部视为相同行
-
 - **输入非法处理**
   * 文件不存在
   * 文件数不是两个
@@ -70,10 +72,9 @@
 - 指令语法: tee {-a}{文件}*
 - **参数说明:**
   - -a：附加到既有文件的后面，而非覆盖
-
-
-
-
+- **输入非法处理:**
+  - 若有`-a`参数, 并且相应的文件不存在, 则会提示报错。
+  
 
 #### cat指令
 
@@ -87,8 +88,9 @@
   - -b：和-n 相似，只不过对于空白行不编号，但需要输出空白行
   - -s：当遇到有连续两行以上的空白行，就代换为一行的空白行
   - -E：在每行结束处显示$
-
-
+- **输入非法处理:**
+  - 在参数识别阶段, 如遇见`-p`等`-`开头的字符, 并且
+  
 
 #### cp指令
 
@@ -98,8 +100,9 @@
 - 指令语法: cp {-n}\[文件1\]\[文件2\]
 - **参数说明:**
   - -n：不覆盖已存在的文件
-
-
+- **输入非法处理:**
+  - 指令不完整 未完整输入源文件和目标文件
+  
 
 #### cd指令
 
@@ -107,8 +110,6 @@
 
 - 获取帮助: cd --help
 - 指令语法: cd \[路径\]
-
-
 
 #### pwd指令
 
@@ -162,9 +163,42 @@
 
 ### 组织框架和文件说明
 
+本次大作业模块化实现，每个模块在相应文件中实现对应的功能（h文件存放声明，cpp文件实现相关功能）具体情况如下：
 
+* 模块1
 
+  h文件：`doDiff.h`
 
+  cpp文件：`doDiff.cpp`
+
+* 模块2
+
+  h文件：`doGrep.h` , ` fileProcess.h`, ` stringProcess.h`
+
+  cpp文件：`doGrep.cpp`, ` fileProcess.cpp`, ` stringProcess.cpp`
+
+* 模块3
+
+  h文件：`doTee.h`, ` doCat.h`, ` doCp.h`, ` doCd.h do`, `Pwd.h`
+
+  cpp文件：`doTee.cpp`, ` doCat.cpp`, ` doCp.cpp`, ` doCd.cpp`, ` doPwd.cpp`
+
+* 模块4
+
+  h文件：`doEcho.h`, ` Terminal.h`, ` additionlFuncs.h`
+
+  cpp文件：`doEcho.cpp`, `Terminal.cpp`, `additionalFuncs.cpp`
+
+* 编译文件
+
+  采用Makefile编译链接
+
+  * make：将对应的文件编译链接，生成可执行文件
+  * make clean：将所有.o文件删除
+
+* 测试文件
+
+  `sample1.txt`,` sample2.txt`,` sample3.txt`
 
 接下来我们分模块介绍每个模块的实现细节, 对于算法的应用, 会适当解析算法的细节, 对于部分重要实现, 我们会详细解说相应的代码。
 
@@ -172,7 +206,7 @@
 
 ##### diff指令
 
-第一部分：准备工作
+**第一部分：准备工作**
 
 1. 储存用户输入的特殊比较要求
 
@@ -202,8 +236,6 @@
        }
    ```
 
-   ##### 
-
 2. 加工文件路径并打开文件，读取文件到file数组里
 
    ```c++
@@ -214,18 +246,14 @@
                return;
            }
            int hang = 1;
-           while (test1.getline(file1[hang], 500)) {
-               hang++;
-           }
+           while (test1.getline(file1[hang], 500))hang++;
            maxlinea = hang - 1;
        }
    ```
-
-   ##### 
-
+   
 3. 将文件复制一份到file_c数组里，所有的预处理都针对复制的文件进行
 
-第二部分：预处理
+**第二部分：预处理**
 
 1. 依次根据用户输入的特殊比较要求将复制的文件作出对应的操作，具体为：
 
@@ -250,8 +278,6 @@
           }
   ```
 
-  ##### 
-
 - -B：删除所有的空白行，同时用a[],b[]两个数组储存变换前后行的对应关系（即a[i]=j表示处理后文件的第i行对应着处理前文件的第j行）（如果没有执行- B，则a[i]=i）
 
   ```c++
@@ -268,8 +294,6 @@
           strcpy(file1_c[i], tempfile1[i]);
       }
   ```
-
-  ##### 
 
 - -i：利用ASKII码将所有小写字母换成大写字母
 
@@ -303,11 +327,9 @@
           }
   ```
 
-  ##### 
-
 - 最后检查“-q"，若执行了它，遍历比较两个文件，遇到不同直接返回不同，否则返回空字符。
 
-第三部分：寻找最优解
+**第三部分：寻找最优解**
 
 思路：找出两个文件中都包含的，且出现顺序相同的，数量尽可能多的一组行（后文中称其为目标行）。这组行保留，其余的行删减，这样可以实现总输出最短。
 
@@ -321,9 +343,7 @@
                bool same = true;
                int spot = 0;
                while (file1_c[i][spot] == file2_c[j][spot]) {
-                   if (file1_c[i][spot] == '\0') {
-                       break;
-                   }
+                   if (file1_c[i][spot] == '\0')break;
                    spot++;
                }
                if (file1_c[i][spot] != file2_c[j][spot]) same = false;
@@ -331,9 +351,7 @@
            }
        }
    ```
-
-   ##### 
-
+   
 2. 创建remember数组，它的(i,j)元表示在行数不小于i且列数不小于j的范围中，能找到的目标行最多有几行。利用迭代算法，从后往前依次推导。
 
    ```c++
@@ -351,8 +369,6 @@
            }
        }
    ```
-
-   ##### 
 
 3. 创建并获得aim数组，它储存了我们要找的目标行，最终输出完全按照它来进行。
 
@@ -385,13 +401,9 @@
        }
    ```
 
-   ##### 
-
-第四部分：输出结果
+**第四部分：输出结果**
 
 按照aim数组输出，aim中的1表示要不变的行，0表示需要删减的行。将删减信息放入strout即可。
-
-
 
 ### part2
 
@@ -525,19 +537,110 @@
 
 ##### tee指令
 
+本指令可将标准输入输出至标准输出，同时复制到若干文件。
+
+1. 利用字符串复制将strin复制到strout。
+2. 将strin读到一个二维char数组中，见到`\n`就换行。
+3. 将char数组依次输出到用户指定的若干个文件中（如果执行了`-a`指令，先尝试打开文件，打开失败则报错，否则接在打开的件后）。
+
 ##### cat指令
+
+cat核心是实现各个参数的识别和组合, 其中参数选择方式是通过正则表达式匹配, 如果识别到相应的参数, 在参数相应的bool开关设置为true。
+
+```c++
+if (regex_match(arguments[i], regex("-\\w+")) and !file_start) {
+    if (regex_match(arguments[i], regex("-n"))) { 
+        opts[0] = true;
+    } else if (regex_match(arguments[i], regex("-b"))) {
+        opts[1] = true;
+    } else if (regex_match(arguments[i], regex("-s"))) {
+        opts[2] = true;
+    } else if (regex_match(arguments[i], regex("-E"))) {
+        opts[3] = true;
+    } else { cerr << "invalid argument!" << endl; return;}
+}
+```
+
+随后根据选择的参数选项, 按条件判断后选择相应的输出模式。
+
+```c++
+static inline void p(string &a, bool last, bool line, int &num) {
+    memset(tmp_for_p, 0, MAXLINE);
+    if (line) {// 是否输出行数
+        if (last)sprintf(tmp_for_p, "%6d  %s$\n", num++, a.c_str()); // -E参数,结尾是加$
+        else sprintf(tmp_for_p, "%6d  %s\n", num++, a.c_str());
+    } else {
+        if (last)sprintf(tmp_for_p, "%s$\n", a.c_str());
+        else sprintf(tmp_for_p, "%s\n", a.c_str());
+    }
+    strcat(gTerm.strout, tmp_for_p);
+}
+static inline void select_print_mode(bool *opts, string line, bool &last_empty, int &num) {
+    if ((opts[1] or opts[2]) and (line.empty())) { // 如果带-n或者-s
+        if (opts[2]) {
+            if (!last_empty) {
+                last_empty = true; // 是否第一次遇见空行(用于-s选项)
+                if (opts[1]) p(line, opts[3], false, num);
+                else p(line, opts[3], opts[0], num);
+                return;
+            } else return;
+        } else {
+            if (opts[1]) p(line, opts[3], false, num);
+            else p(line, opts[3], opts[0], num);
+            return;
+        }
+    }
+    last_empty = false;
+    p(line, opts[3], opts[0] or opts[1], num);
+}
+```
 
 ##### cp指令
 
+* **整体构思**
+
+  先将工作目录和根目录进行拼接，再以相应的方式打开文件并写入。
+
+* -n模式
+
+  以ios::app模式打开文件
+
+* 不带-n模式
+
+  以默认方式打开文件
+
 ##### cd指令
 
+通过简单的参数数量判别参数数量的合法性, 随后通过正则表达式验证路径是否合法, 是否是相对路径或者绝对路径, 随后进行路径的拼接和处理工作, 最后将结果路径写入`gTerm.wdri`。
+
+```c++
+if (regex_match(P, regex("--help"))) {
+   // 显示帮助
+} else if (regex_match(P, regex("/((\\w|-|.)*/?)*"))) {
+    //绝对路径处理方式
+} else if (regex_match(P, regex("((\\w|-|.)*/?)*"))) {
+    //相对路径处理
+} else { // 报错
+    cerr << "invalid path!" << endl;
+}=
+```
+
+
+
 ##### pwd指令
+
+经过简单的参数判断和验证, 一切正常后, 将`gTerm.wdir`复制到`gTerm.strout`即可。
+
+```c+
+strcat(gTerm.strout, gTerm.wdir);
+strcat(gTerm.strout, "\n");
+```
 
 ### part4
 
 ##### echo指令
 
-
+直接依次将内容参数拼接起来，随后写入stdout。对-n参数进行辨别后，再确认是否要添加`\n`这个字符。
 
 ##### 框架实现和复合指令
 
@@ -616,17 +719,32 @@ void doCls() {
 
 ##### change指令(主题切换)
 
+这部分和程序框架是耦合的，每次程序输出新的命令提示符都会进行颜色参数的选择，而这些选择是基于`gTerm.theme`这个属性进行选择的。
 
+```c++
+void doChange(int argc, char *argv[]) {
+    if (argc <= 1) {
+        cerr << "select a theme please~" << endl;
+    } else if (strlen(argv[1]) > 1 or argv[1][0] > '2' or argv[1][0] < '0') {
+        cerr << "select theme from number 0 to 2" << endl;
+    } else {gTerm.theme = argv[1][0] - '0';}
+}
+
+inline void printColor(const string &s, int front, int color, bool light = false) { // 本函数是框架中的函数
+    if (light) printf("\033[%d%dm%s\033[0m", front, color, s.c_str());
+    else printf("\033[1;%d%dm%s\033[0m", front, color, s.c_str());
+}
+```
 
 ##### vim指令(系统调用)
 
+通过系统调用进入vim程序，进行文本的编辑。
+
 ##### exit指令(退出程序)
 
-
+通过识别关键字，匹配成功后直接退出程序。
 
 ## 测试部分
-
-
 
 ### 视频测试内容
 
@@ -638,16 +756,60 @@ void doCls() {
 Machine Name:mac
 Root Directory: #相应工作目录
 Login:usr
+
+# 显示当前文件列表
 ls
+# 进入测试文件夹
+cd ././//testcase/../testcase
+
+# 查看当前工作路径
 pwd
-echo hello|grep hel -|cat -n -
-echo hello|diff - a.txt|cat -s -
-cat a.txt |grep di -|cat -n -s  -E -
+
+# echo 验证
+echo -n hello world
+
+# 串式验证diff 
+echo Merry days will come, believe.|diff - sample3.txt|cat -n -
+
+# 选择验证diff的几个参数
+diff sample2.txt sample3.txt
+
+diff -b -B sample2.txt sample3.txt
+
+
+
+# 向标准输出写入文件,匹配后输出
+cat sample1.txt |grep y*u -|cat -n -s  -E -
+
+# 清屏
 cls
 
+# grep * 进行比较
+echo programDesigning | grep * -
+
+# 忽略大小写, 添加行号, 在每行前加文件名, 测试指令冲突, 冲突按后出现的
+grep -i -H -h -H -n  y..r sample2.txt
+
+# 加文件名和行号,无冲突
+grep -H -n you sample1.txt sample2.txt
+
+#echo将"added"写入标准输出,tee指令将标准输入输出到标准输出中，并不覆盖地输出到文件a中；再将a文件不覆盖地复制到文件b中
+#最后将a与b非空行编号，合并连续空行，在每行末尾附上$符号，逐行输出到标准输出中
+echo added|tee -a sample1.txt|cp -n sample1.txt sample4.txt|cat -b -s -E sample3.txt sample4.txt 
+
+
+# 切换主题
+change 1
+
+# 进入vim
+vim
+
+# 退出
+exit
+
+
+
 ```
-
-
 
 
 
@@ -666,7 +828,6 @@ Compare FILES line by line
  - I(ignore - matching - lines = RE) :ignore changes where all lines match RE
  - q(--brief) :report only when files differ
  
- /Users/iMac-1/Github/tinyshell_combine
 //接下来的三组测试数据来展示diff对于特殊比较要求的处理
 # a.txt中内容为：
 # f i  rs t
