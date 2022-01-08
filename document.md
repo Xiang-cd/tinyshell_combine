@@ -39,9 +39,9 @@
   - -w: 忽略全部空格字符
   - -I[字符串] :含有[字符串]的行全部视为相同行
 - **输入非法处理**
-  * 文件不存在
-  * 文件数不是两个
-  * 参数无法识别
+  * 文件不存在。
+  * 输入文件数量有误。
+  * 参数无法识别。
 
 #### grep指令
 
@@ -60,9 +60,9 @@
 
 * 相互排斥的指令处理：以后出现的为准
 * **输入非法处理**
-  * 文件不存在
-  * 指令有误
-  * 参数有误
+  * 文件不存在。
+  * 指令有误。
+  * 参数有误。
 
 #### tee指令
 
@@ -89,7 +89,9 @@
   - -s：当遇到有连续两行以上的空白行，就代换为一行的空白行
   - -E：在每行结束处显示$
 - **输入非法处理:**
-  - 在参数识别阶段, 如遇见`-p`等`-`开头的字符, 并且
+  - 参数有误。在参数识别阶段, 如遇见`-p`等或者未输入目标文件等非法指令会报错。
+  - 文件缺失报错。如果目标文件不存在会报错。
+  - 路径或文件名非法报错。如果输入的路径或者文件名非法则会给出报错。
   
 
 #### cp指令
@@ -101,7 +103,10 @@
 - **参数说明:**
   - -n：不覆盖已存在的文件
 - **输入非法处理:**
-  - 指令不完整 未完整输入源文件和目标文件
+  - 指令不完整。
+  - 错误输入指令。
+  - 未输入文件1或文件2。
+  - 文件1或文件2不存在。
   
 
 #### cd指令
@@ -110,6 +115,10 @@
 
 - 获取帮助: cd --help
 - 指令语法: cd \[路径\]
+- **输入非法处理:**
+  - 指令错误。例如输入参数过多或者过少会报错。
+  - 路径错误。输入的路径错误会报错。
+
 
 #### pwd指令
 
@@ -117,6 +126,9 @@
 
 - 获取帮助: pwd --help
 - 指令语法: pwd
+- **输入非法处理:**
+  - 指令错误。例如输入参数过多会报错。
+
 
 #### echo指令
 
@@ -126,6 +138,7 @@
 - 指令语法 echo {-n}{字符串}*
 - **参数说明:**
   - -n: 结尾不进行自动换行。
+
 
 ### 额外功能
 
@@ -198,7 +211,7 @@
 
 * 测试文件
 
-  `sample1.txt`,` sample2.txt`,` sample3.txt`
+  `sample1.txt`,` sample2.txt`,` sample3.txt` `sample4.txt`四个文件均存放于testcase文件夹。
 
 接下来我们分模块介绍每个模块的实现细节, 对于算法的应用, 会适当解析算法的细节, 对于部分重要实现, 我们会详细解说相应的代码。
 
@@ -812,89 +825,4 @@ exit
 ```
 
 
-
-### 其他测试内容和测试结果
-
-```shell
-#diff 部分
-diff --help
-#输出：
-diff--help:
-Compare FILES line by line
- - b(ignore - space - change) :ignore changes in the amount of white space
- - B(ignore - blank - lines) :ignore changes where lines are all blank
- - i(ignore - case) :ignore case differences in file contents
- - w(--ignore - all - space) :ignore all white space
- - I(ignore - matching - lines = RE) :ignore changes where all lines match RE
- - q(--brief) :report only when files differ
- 
-//接下来的三组测试数据来展示diff对于特殊比较要求的处理
-# a.txt中内容为：
-# f i  rs t
-# second
-#
-# thi  r d
-
-# b.txt中内容为：
-# fir s   t
-#
-# seconnnnnd
-# THi r D
-1.diff -b -i -B a.txt b.txt:
-#输出：
-1d1
-<f i  rs t
-<second
-4a1
->fir s   t
->seconnnnnd
-2.diff -Isecon -w a.txt b.txt:
-#输出：
-2a2
->
-3d4
-<
-<thi  r d
-4a4
->THi r D
-3.diff -q -i -Isec -B -w a.txt b.txt:
-#输出：(按照特殊的比较要求，两个文件无差异，故无输出)
-
-
-//本组测试数据来直观展示diff输出行数尽可能少（a第一行与b最后一行相同，但为了行数最短，还是要将其删掉）
-# a.txt中内容为：
-# 9898
-# 2 2  2
-# 33
-# 
-# A
-# b.txt中内容为：
-# 222
-# 
-# 3   3
-# a
-# 9999
-diff -I9 -w -B -i a.txt b.txt:
-#输出：
-1d1
-<9898
-5a5
->9999
-
-
-//最后，展示diff比较大文件的能力（几千行的文件可以瞬间输出比较结果）
-diff的复杂度足以撑住上千行的文件，由于输入输出过大，不在此详细展示，仅截取部分输出：
-diff doDiff.cpp doGrep.cpp:
-#部分输出：
-<        cout << endl;
-<        //system("pause");
-<    }
-490a212
->                        strcat(gTerm.strout, colorLine(fileVec[i].contents[j], fileVec[i].matchPositions[j].first,
->                                                       fileVec[i].matchPositions[j].second).c_str());
->                        strcat(gTerm.strout, "\n");
-491d216
-<    if (command[3] == 1) {
-<        for (int i = 1; i <= maxlinea - konga; i++) {
-```
 
